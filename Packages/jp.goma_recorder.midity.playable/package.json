@@ -1,0 +1,30 @@
+{
+  "name": "jp.goma_recorder.midity.playable",
+  "displayName": "Playable Midi",
+  "author": "Tabi Morinaga",
+  "version": "0.0.1",
+  "unity": "2020.1",
+  "description": "Playable Midi is a custom timeline/playables package that provides functionality to control object properties based on sequence data contained in a standard MIDI file",
+  "keywords": [
+    "unity",
+    "midi",
+    "timeline",
+    "playable"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/goma-recorder/PlayableMidi.git"
+  },
+  "bugs": {
+    "url": "https://github.com/goma-recorder/PlayableMidi/issues"
+  },
+  "homepage": "https://github.com/goma-recorder/PlayableMidi#readme",
+  "samples": [
+    {
+      "displayName": "Sample Project",
+      "description": "This is sample",
+      "path": "Samples~/"
+    }
+  ]
+}
