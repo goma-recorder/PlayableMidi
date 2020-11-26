@@ -9,7 +9,7 @@ functionality to control object properties based on sequence data contained
 in a standard MIDI file (`.mid` file). This allows you to create musically
 synchronized animation using a DAW (digital audio workstation) that is easy
 to manage accurately synchronized timings compared to other non-musical
-timeline editors like Unity's one.
+timeline editors like Unity's one. Playable Midi is an extension of the [MIDI Animation Track](https://github.com/keijiro/MidiAnimationTrack).
 
 
 System requirements
