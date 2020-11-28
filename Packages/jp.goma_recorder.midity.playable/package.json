@@ -2,7 +2,7 @@
   "name": "jp.goma_recorder.midity.playable",
   "displayName": "Playable Midi",
   "author": "Tabi Morinaga",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "unity": "2020.1",
   "description": "Playable Midi is a custom timeline/playables package that provides functionality to control object properties based on sequence data contained in a standard MIDI file",
   "keywords": [
