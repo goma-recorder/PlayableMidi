@@ -7,19 +7,21 @@ namespace Midity
 
         #region Parameters
 
-        public MidiTrackPlayer(MidiTrack track)
+        public MidiTrackPlayer(MidiTrack track,Action<MTrkEvent> onPush)
         {
             this.track = track;
+            this.onPush = onPush;
         }
-        public MidiTrack track;
+        public readonly MidiTrack track;
+        public Action<MTrkEvent> onPush;
 
         #endregion
 
 
         #region MIDI signal emission
 
-        int headIndex = 0;
-        uint lastTick = 0;
+        int _headIndex = 0;
+        uint _lastTick = 0;
         public void ResetHead(float time, bool loop = true)
         {
             var targetTick = (uint)(time * track.tempo / 60 * track.ticksPerQuarterNote);
@@ -27,34 +29,33 @@ namespace Midity
         }
         public void ResetHead(uint targetTick, bool loop = true)
         {
-            lastTick = 0u;
-            while (targetTick - lastTick > track.events[headIndex].ticks)
+            _lastTick = 0u;
+            while (targetTick - _lastTick > track.events[_headIndex].ticks)
             {
-                lastTick += track.events[headIndex].ticks;
-                headIndex++;
-                if (loop && headIndex == track.events.Count)
-                    headIndex = 0;
+                _lastTick += track.events[_headIndex].ticks;
+                _headIndex++;
+                if (loop && _headIndex == track.events.Count)
+                    _headIndex = 0;
             }
         }
-        public void Play(float currentTime, Action<MTrkEvent> onPushEvent = null, bool loop = true)
+        public void Play(float currentTime, bool loop = true)
         {
             var currentTick = (uint)(currentTime * track.tempo / 60 * track.ticksPerQuarterNote);
-            if (currentTick < lastTick)
+            if (currentTick < _lastTick)
             {
                 ResetHead(currentTick, loop);
                 return;
             }
 
-            var deltatick = currentTick - lastTick;
-            while (track.events[headIndex].ticks <= deltatick)
+            var deltaTick = currentTick - _lastTick;
+            while (track.events[_headIndex].ticks <= deltaTick)
             {
-                lastTick += track.events[headIndex].ticks;
-                deltatick -= track.events[headIndex].ticks;
-                if (onPushEvent != null)
-                    onPushEvent(track.events[headIndex]);
-                headIndex++;
-                if (loop && headIndex == track.events.Count)
-                    headIndex = 0;
+                _lastTick += track.events[_headIndex].ticks;
+                deltaTick -= track.events[_headIndex].ticks;
+                onPush?.Invoke(track.events[_headIndex]);
+                _headIndex++;
+                if (loop && _headIndex == track.events.Count)
+                    _headIndex = 0;
             }
         }
 
