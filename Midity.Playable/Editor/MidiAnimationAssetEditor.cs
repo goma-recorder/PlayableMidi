@@ -24,21 +24,30 @@ namespace Midity.Playable.Editor
             var bars = (float)asset.duration / (asset.ticksPerQuarterNote * 4);
             _durationText = bars.ToString() + (bars > 1 ? " bars" : " bar");
 
-            var note = new HashSet<int>();
+            var note = new HashSet<(byte number,NoteOctave octave,NoteName name)>();
             var cc = new HashSet<int>();
 
-            foreach (var holder in asset.midiEvents)
+            foreach (var holder in asset.noteEvents)
             {
-                var midiEvent = holder.Event;
-                switch (midiEvent.status & 0xf0u)
-                {
-                    case 0x80u:
-                    case 0x81u: note.Add(midiEvent.data1); break;
-                    case 0xb0u: cc.Add(midiEvent.data1); break;
-                }
+                var noteEvent = holder.Event;
+                if(!noteEvent.isNoteOn)
+                    note.Add((noteEvent.NoteNumber,noteEvent.noteOctave,noteEvent.noteName));
+            }
+            foreach (var holder in asset.controlChangeEvents)
+            {
+                var controlChangeEvent = holder.Event;
+                cc.Add(controlChangeEvent.controlChangeNumber);
             }
 
-            _noteText = note.Count == 0 ? "-" : string.Join(", ", note.OrderBy(x => x));
+            if (note.Count == 0)
+                _noteText = "-";
+            else
+            {
+                var sorted = note
+                    .OrderBy(x => x.number)
+                    .Select(x => $"{x.octave} {x.name}");
+                _noteText = string.Join(",", sorted);
+            }
             _ccText = cc.Count == 0 ? "-" : string.Join(", ", cc.OrderBy(x => x));
         }
 

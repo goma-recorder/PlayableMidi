@@ -250,17 +250,14 @@ namespace Midity
                     };
             }
         }
-        static MidiEvent ReadMidiEvent(uint allTicks, uint ticks, byte stat, MidiDataStreamReader reader)
+        static MTrkEvent ReadMidiEvent(uint allTicks, uint ticks, byte stat, MidiDataStreamReader reader)
         {
             var b1 = reader.ReadByte();
             var b2 = (stat & 0xe0u) == 0xc0u ? (byte)0 : reader.ReadByte();
-            return new MidiEvent
-            {
-                ticks = ticks,
-                status = stat,
-                data1 = b1,
-                data2 = b2
-            };
+            if((stat & 0xf0) == 0xb0)
+                return new ControlChangeEvent(ticks,stat,b1,b2);
+            else
+                return new NoteEvent(ticks,stat,b1,b2);
         }
     }
 }

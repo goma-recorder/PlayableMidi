@@ -21,19 +21,23 @@ namespace Midity.Playable
                 var offset = 0u;
                 var index = 0;
 
-                var midiEvents = new List<MTrkEventHolder<MidiEvent>>();
+                var noteEvents = new List<MTrkEventHolder<NoteEvent>>();
+                var controlChangeEvents = new List<MTrkEventHolder<ControlChangeEvent>>();
                 var textEvents = new List<MTrkEventHolder<TextEvent>>();
                 var lyricEvents = new List<MTrkEventHolder<LyricEvent>>();
                 var markerEvents = new List<MTrkEventHolder<MarkerEvent>>();
                 var queueEvents = new List<MTrkEventHolder<QueueEvent>>();
                 var beatEvents = new List<MTrkEventHolder<BeatEvent>>();
                 var keyEvents = new List<MTrkEventHolder<KeyEvent>>();
-                for (var i = 0; i < track.events.Count; i++)
+                foreach (var t in track.events)
                 {
-                    switch (track.events[i])
+                    switch (t)
                     {
-                        case MidiEvent midiEvent:
-                            AddList(midiEvent, midiEvents);
+                        case NoteEvent noteEvent:
+                            AddList(noteEvent,noteEvents);
+                            break;
+                        case ControlChangeEvent controlChangeEvent:
+                            AddList(controlChangeEvent,controlChangeEvents);
                             break;
                         case TextEvent textEvent:
                             AddList(textEvent, textEvents);
@@ -54,13 +58,19 @@ namespace Midity.Playable
                             AddList(keyEvent, keyEvents);
                             break;
                         default:
-                            offset += track.events[i].ticks;
+                            offset += t.ticks;
                             break;
                     }
                 }
                 anim.template.eventCount = index;
-                anim.template.midiEvents = midiEvents.ToArray();
+                anim.template.noteEvents = noteEvents.ToArray();
+                anim.template.controlChangeEvents = controlChangeEvents.ToArray();
+                anim.template.textEvents = textEvents.ToArray();
                 anim.template.lyricEvents = lyricEvents.ToArray();
+                anim.template.markerEvents = markerEvents.ToArray();
+                anim.template.queueEvents = queueEvents.ToArray();
+                anim.template.beatEvents = beatEvents.ToArray();
+                anim.template.keyEvents = keyEvents.ToArray();
                 return anim;
 
                 void AddList<T>(T mEvent, List<MTrkEventHolder<T>> list) where T : MTrkEvent
