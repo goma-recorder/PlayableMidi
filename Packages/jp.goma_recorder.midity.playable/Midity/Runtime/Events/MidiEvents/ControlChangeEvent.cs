@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace Midity
 {
@@ -13,13 +14,14 @@ namespace Midity
             set => channel = (byte)Mathf.Clamp(value, 0, 16);
         }
 
+        public byte Status => (byte)(0xb0 | Channel);
+
         public byte controlChangeNumber;
         public byte data;
         public ControlChangeEvent(){}
-        public ControlChangeEvent(uint ticks, byte status, byte controlChangeNumber, byte data)
+        public ControlChangeEvent(uint ticks, byte channel, byte controlChangeNumber, byte data):base(ticks)
         {
-            this.ticks = ticks;
-            Channel = (byte)(status & 0x0f);
+            Channel = channel;
             this.controlChangeNumber = controlChangeNumber;
             this.data = data;
         }
