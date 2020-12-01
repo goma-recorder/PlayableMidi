@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace Midity
 {
@@ -15,19 +16,22 @@ namespace Midity
             get => channel;
             set => channel = (byte)Mathf.Clamp(value, 0, 16);
         }
+
+        public byte Status => (byte)((isNoteOn ? 0x90 : 0x80) | Channel);
         public NoteName noteName;
         public NoteOctave noteOctave;
         public byte NoteNumber => (byte)((int)noteOctave * 12 + (int)noteName);
         public byte velocity;
         
         public NoteEvent(){}
-        public NoteEvent(uint ticks, byte status, byte noteNumber, byte velocity)
+
+        public NoteEvent(uint ticks, bool isNoteOn, byte channel, NoteName noteName, NoteOctave noteOctave,
+            byte velocity):base(ticks)
         {
-            this.ticks = ticks;
-            isNoteOn = (status & 0xf0) == 0x90;
-            Channel = (byte)(status & 0x0f);
-            noteName = (NoteName)(noteNumber % 12);
-            noteOctave = (NoteOctave)(noteNumber / 12);
+            this.isNoteOn = isNoteOn;
+            Channel = channel;
+            this.noteName = noteName;
+            this.noteOctave = noteOctave;
             this.velocity = velocity;
         }
     }   
