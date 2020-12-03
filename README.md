@@ -21,6 +21,43 @@ Installation
 ------------
 
 <!--4567890123456789012345678901234567890123456789012345678901234567890123456-->
+To import the package, please add the following sections to the package
+manifest file (`Packages/manifest.json`).
+
+To the `scopedRegistries` section:
+
+```
+{
+  "name": "goma_recorder",
+  "url": "https://registry.npmjs.com",
+  "scopes": [ "jp.goma_recorder" ]
+}
+```
+
+To the `dependencies` section:
+
+```
+"jp.goma_recorder.midity.playable": "1.1.0"
+```
+
+After changes, the manifest file should look like below:
+
+```
+{
+  "scopedRegistries": [
+    {
+      "name": "goma_recorder",
+      "url": "https://registry.npmjs.com",
+      "scopes": [ "jp.goma_recorder" ]
+    }
+  ],
+  "dependencies": {
+    "jp.goma_recorder.midity.playable": "1.1.0",
+    ...
+```
+
+or
+
 `Window -> Package Manager -> +▼ -> Add package from git url`
  - `https://github.com/goma-recorder/PlayableMidi.git?#upm`
 
