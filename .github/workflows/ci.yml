@@ -26,6 +26,9 @@ jobs:
         git branch -d upm &> /dev/null || echo upm branch not found
         git subtree split -P "$PKG_ROOT" -b upm
         git checkout upm
+        git checkout master README.md
+        git checkout master CHANGELOG.md
+        git checkout master LICENSE
         if [[ -d "Samples" ]]; then
           git mv Samples Samples~
           rm -f Samples.meta
