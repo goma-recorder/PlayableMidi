@@ -16,7 +16,8 @@ namespace Midity.Playable
         public uint duration;
         public uint ticksPerQuarterNote = 96;
         public int eventCount;
-        public MTrkEventHolder<MidiEvent>[] midiEvents;
+        public MTrkEventHolder<NoteEvent>[] noteEvents;
+        public MTrkEventHolder<ControlChangeEvent>[] controlChangeEvents;
         public MTrkEventHolder<TextEvent>[] textEvents;
         public MTrkEventHolder<LyricEvent>[] lyricEvents;
         public MTrkEventHolder<MarkerEvent>[] markerEvents;
@@ -47,7 +48,8 @@ namespace Midity.Playable
         {
             var list = new List<MTrkEvent>();
             var listIndex = 0;
-            var midiIndex = 0;
+            var noteIndex = 0;
+            var controlChangeIndex = 0;
             var textIndex = 0;
             var lyricIndex = 0;
             var markerIndex = 0;
@@ -56,7 +58,8 @@ namespace Midity.Playable
             var keyIndex = 0;
             for (; listIndex < eventCount; listIndex++)
             {
-                Search(ref midiIndex, midiEvents);
+                Search(ref noteIndex,noteEvents);
+                Search(ref controlChangeIndex,controlChangeEvents);
                 Search(ref textIndex, textEvents);
                 Search(ref lyricIndex, lyricEvents);
                 Search(ref markerIndex, markerEvents);
@@ -156,33 +159,33 @@ namespace Midity.Playable
 
         #region Private variables and methods
 
-        (MidiEvent i0, MidiEvent i1) GetCCEventIndexAroundTick(uint tick, int ccNumber)
+        (ControlChangeEvent i0, ControlChangeEvent i1) GetCCEventIndexAroundTick(uint tick, int ccNumber)
         {
             var time = 0u;
-            MidiEvent lastEvent = null;
+            ControlChangeEvent lastEvent = null;
             foreach (var mEvent in MtrkEvents)
             {
                 time += mEvent.ticks;
-                if (!(mEvent is MidiEvent e)) continue;
-                if (!e.IsCC || e.data1 != ccNumber) continue;
+                if (!(mEvent is ControlChangeEvent e)) continue;
+                if (e.controlChangeNumber != ccNumber) continue;
                 if (time > tick) return (lastEvent, e);
                 lastEvent = e;
             }
             return (lastEvent, lastEvent);
         }
 
-        (MidiEvent iOn, MidiEvent iOff) GetNoteEventsBeforeTick(uint tick, MidiNoteFilter note)
+        (NoteEvent iOn, NoteEvent iOff) GetNoteEventsBeforeTick(uint tick, MidiNoteFilter note)
         {
-            MidiEvent eOn = null;
-            MidiEvent eOff = null;
+            NoteEvent eOn = null;
+            NoteEvent eOff = null;
             var time = 0u;
             foreach (var mEvent in MtrkEvents)
             {
                 time += mEvent.ticks;
-                if (!(mEvent is MidiEvent e)) continue;
+                if (!(mEvent is NoteEvent e)) continue;
                 if (time > tick) break;
                 if (!note.Check(e)) continue;
-                if (e.IsNoteOn)
+                if (e.isNoteOn)
                 {
                     eOn = e;
                     eOff = null;
@@ -248,7 +251,7 @@ namespace Midity.Playable
                 Mathf.Max(0, time - offTime)
             );
 
-            var velocity = eOn.data2 / 127.0f;
+            var velocity = eOn.velocity / 127.0f;
 
             return envelope * velocity;
         }
@@ -264,7 +267,7 @@ namespace Midity.Playable
             Track.GetAbstractTime(iOn ,out var onTime);
 
             var curve = control.curve.Evaluate(Mathf.Max(0, time - onTime));
-            var velocity = iOn.data2 / 127.0f;
+            var velocity = iOn.velocity / 127.0f;
 
             return curve * velocity;
         }
@@ -275,13 +278,13 @@ namespace Midity.Playable
             var (i0,i1) = GetCCEventIndexAroundTick(tick, control.ccNumber);
 
             if (i0 == null) return 0;
-            if (i1 == null) return i0.data2 / 127.0f;
+            if (i1 == null) return i0.data / 127.0f;
 
             Track.GetAbstractTime(i0, out var t0);
             Track.GetAbstractTime(i1, out var t1);
 
-            var v0 = i0.data2 / 127.0f;
-            var v1 = i1.data2 / 127.0f;
+            var v0 = i0.data / 127.0f;
+            var v1 = i1.data / 127.0f;
 
             return Mathf.Lerp(v0, v1, Mathf.Clamp01((time - t0) / (t1 - t0)));
         }

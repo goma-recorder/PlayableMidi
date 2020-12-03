@@ -7,14 +7,12 @@
   "description": "Playable Midi is a custom timeline/playables package that provides functionality to control object properties based on sequence data contained in a standard MIDI file",
   "keywords": [
     "unity",
-    "midi",
-    "timeline",
-    "playable"
+    "midi"
   ],
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/goma-recorder/PlayableMidi.git"
+    "url": "https://github.com/goma-recorder/PlayableMidi.git"
   },
   "bugs": {
     "url": "https://github.com/goma-recorder/PlayableMidi/issues"

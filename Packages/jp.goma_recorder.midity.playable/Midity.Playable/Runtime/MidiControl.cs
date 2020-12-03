@@ -24,14 +24,14 @@ namespace Midity.Playable
 
         public bool Check(MTrkEvent e)
         {
-            if (e is MidiEvent midiEvent)
+            if (e is NoteEvent midiEvent)
                 return Check(midiEvent);
             else
                 return false;
         }
-        public bool Check(MTrkEvent e, out MidiEvent noteEvent)
+        public bool Check(MTrkEvent e, out NoteEvent noteEvent)
         {
-            if (e is MidiEvent ne)
+            if (e is NoteEvent ne)
             {
                 noteEvent = ne;
                 return Check(ne);
@@ -42,11 +42,10 @@ namespace Midity.Playable
                 return false;
             }
         }
-        public bool Check(MidiEvent e)
+        public bool Check(NoteEvent e)
         {
-            return e.IsNote &&
-                (octave == MidiOctave.All || e.data1 / 12 == (int)octave - 1) &&
-                (note == MidiNote.All || e.data1 % 12 == (int)note - 1);
+            return (octave == MidiOctave.All || (int)e.noteOctave == (int)octave - 1) &&
+                (note == MidiNote.All || (int)e.noteName == (int)note - 1);
         }
     }
 

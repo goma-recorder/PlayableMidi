@@ -3,7 +3,14 @@
     [System.Serializable]
     public sealed class ChannelPrefixEvent : MTrkEvent
     {
-        public const byte status = 0x20;
+        public const byte EventNumber = 0x20;
         public byte data;
+        
+        public ChannelPrefixEvent(){}
+
+        public ChannelPrefixEvent(uint ticks, byte data) : base(ticks)
+        {
+            this.data = data;
+        }
     }
 }

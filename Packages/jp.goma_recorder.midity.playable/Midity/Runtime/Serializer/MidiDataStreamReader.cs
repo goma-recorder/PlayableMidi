@@ -1,21 +1,24 @@
 using System;
+using System.Collections.Generic;
 
 namespace Midity
 {
     // MIDI binary data stream reader
-    sealed class MidiDataStreamReader
+    public sealed class MidiDataStreamReader
     {
         #region Internal members
 
         readonly byte[] _data;
+        private readonly int _codepage;
 
         #endregion
 
         #region Constructor
 
-        public MidiDataStreamReader(byte[] data)
+        public MidiDataStreamReader(byte[] data,int codepage)
         {
             _data = data;
+            _codepage = codepage;
         }
 
         #endregion
@@ -51,12 +54,9 @@ namespace Midity
             return bytes;
         }
 
-        public string ReadChars(uint length, int codepage = 932)
+        public string ReadChars(uint length)
         {
-            var bytesData = new byte[length];
-            for (var i = 0; i < length; i++)
-                bytesData[i] = ReadByte();
-            return System.Text.Encoding.GetEncoding(codepage).GetString(bytesData);
+            return System.Text.Encoding.GetEncoding(_codepage).GetString(ReadBytes(length));
         }
 
         public uint ReadBEUInt(byte length)
@@ -75,6 +75,21 @@ namespace Midity
             while (true)
             {
                 uint b = ReadByte();
+                v += b & 0x7fu;
+                if (b < 0x80u) break;
+                v <<= 7;
+            }
+            return v;
+        }
+
+        public static uint ReadMultiByteValue(byte[] bytes)
+        {
+            var i = 0;
+            var v = 0u;
+            while (true)
+            {
+                uint b = bytes[i];
+                i++;
                 v += b & 0x7fu;
                 if (b < 0x80u) break;
                 v <<= 7;

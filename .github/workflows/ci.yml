@@ -26,6 +26,9 @@ jobs:
         git branch -d upm &> /dev/null || echo upm branch not found
         git subtree split -P "$PKG_ROOT" -b upm
         git checkout upm
+        git checkout master README.md
+        git checkout master CHANGELOG.md
+        git checkout master LICENSE
         if [[ -d "Samples" ]]; then
           git mv Samples Samples~
           rm -f Samples.meta
@@ -43,3 +46,11 @@ jobs:
         git push origin --tags
       env:
         TAG: upm/v${{ steps.semantic.outputs.new_release_version }}
+    - uses: actions/setup-node@v1
+      with:
+        node-version: '12.x'
+        registry-url: 'https://registry.npmjs.org'
+    - run: npm install
+    - run: npm publish
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
