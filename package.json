@@ -12,7 +12,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/goma-recorder/PlayableMidi.git"
+    "url": "https://github.com/goma-recorder/PlayableMidi.git"
   },
   "bugs": {
     "url": "https://github.com/goma-recorder/PlayableMidi/issues"
