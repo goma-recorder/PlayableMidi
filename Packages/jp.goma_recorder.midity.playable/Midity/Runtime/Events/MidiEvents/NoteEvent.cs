@@ -3,8 +3,6 @@ using UnityEngine;
 
 namespace Midity
 {
-    public enum NoteName{C, CSharp, D, DSharp, E, F, FSharp, G, GSharp, A, ASharp, B}
-    public enum NoteOctave{Minus2, Minus1, Zero, Plus1, Plus2, Plus3, Plus4, Plus5, Plus6, Plus7, Plus8}
     [System.Serializable]
     public class NoteEvent : MTrkEvent
     {
