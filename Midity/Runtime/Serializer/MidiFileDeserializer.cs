@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using UnityEngine;
+using static Midity.NoteKey;
 
 namespace Midity
 {
@@ -11,7 +11,7 @@ namespace Midity
 
         public static MidiTrack[] Load(byte[] data)
         {
-            var reader = new MidiDataStreamReader(data,932);
+            var reader = new MidiDataStreamReader(data, 932);
 
             // Chunk type
             if (reader.ReadChars(4) != "MThd")
@@ -83,6 +83,7 @@ namespace Midity
                         break;
                 }
             }
+
             // Asset instantiation
             return new MidiTrack
             {
@@ -168,10 +169,70 @@ namespace Midity
                     return new BeatEvent(ticks, bytes[0], bytes[1], bytes[2], bytes[3]);
                 // 59
                 case KeyEvent.EventNumber:
-                    var sf = reader.ReadByte();
-                    var mi = reader.ReadByte();
-                    var key = (NoteKey) (mi << 8 | sf);
-                    return new KeyEvent(ticks, key);
+                    var sf = (sbyte) reader.ReadByte();
+                    var mi = reader.ReadByte() == 0;
+
+                    if ((sf, mi) == (-7, true))
+                        return new KeyEvent(ticks, CFlatMajor);
+                    if ((sf, mi) == (-7, false))
+                        return new KeyEvent(ticks, AFlatMinor);
+                    if ((sf, mi) == (-6, true))
+                        return new KeyEvent(ticks, GFlatMajor);
+                    if ((sf, mi) == (-6, false))
+                        return new KeyEvent(ticks, EFlatMinor);
+                    if ((sf, mi) == (-5, true))
+                        return new KeyEvent(ticks, DFlatMajor);
+                    if ((sf, mi) == (-5, false))
+                        return new KeyEvent(ticks, BFlatMinor);
+                    if ((sf, mi) == (-4, true))
+                        return new KeyEvent(ticks, AFlatMajor);
+                    if ((sf, mi) == (-4, false))
+                        return new KeyEvent(ticks, FMinor);
+                    if ((sf, mi) == (-3, true))
+                        return new KeyEvent(ticks, EFlatMajor);
+                    if ((sf, mi) == (-3, false))
+                        return new KeyEvent(ticks, CMinor);
+                    if ((sf, mi) == (-2, true))
+                        return new KeyEvent(ticks, BFlatMajor);
+                    if ((sf, mi) == (-2, false))
+                        return new KeyEvent(ticks, GMinor);
+                    if ((sf, mi) == (-1, true))
+                        return new KeyEvent(ticks, FMajor);
+                    if ((sf, mi) == (-1, false))
+                        return new KeyEvent(ticks, DMinor);
+                    if ((sf, mi) == (0, true))
+                        return new KeyEvent(ticks, CMajor);
+                    if ((sf, mi) == (0, false))
+                        return new KeyEvent(ticks, AMinor);
+                    if ((sf, mi) == (1, true))
+                        return new KeyEvent(ticks, GMajor);
+                    if ((sf, mi) == (1, false))
+                        return new KeyEvent(ticks, EMinor);
+                    if ((sf, mi) == (2, true))
+                        return new KeyEvent(ticks, DMajor);
+                    if ((sf, mi) == (2, false))
+                        return new KeyEvent(ticks, BMinor);
+                    if ((sf, mi) == (3, true))
+                        return new KeyEvent(ticks, AMajor);
+                    if ((sf, mi) == (3, false))
+                        return new KeyEvent(ticks, FSharpMinor);
+                    if ((sf, mi) == (4, true))
+                        return new KeyEvent(ticks, EMajor);
+                    if ((sf, mi) == (4, false))
+                        return new KeyEvent(ticks, CSharpMinor);
+                    if ((sf, mi) == (5, true))
+                        return new KeyEvent(ticks, BMajor);
+                    if ((sf, mi) == (5, false))
+                        return new KeyEvent(ticks, GSharpMinor);
+                    if ((sf, mi) == (6, true))
+                        return new KeyEvent(ticks, FSharpMajor);
+                    if ((sf, mi) == (6, false))
+                        return new KeyEvent(ticks, DSharpMinor);
+                    if ((sf, mi) == (7, true))
+                        return new KeyEvent(ticks, CSharpMajor);
+                    if ((sf, mi) == (7, false))
+                        return new KeyEvent(ticks, ASharpMinor);
+                    return null;
                 // 7f
                 case SequencerUniqueEvent.EventNumber:
                     return new SequencerUniqueEvent(ticks, reader.ReadBytes(length));
@@ -180,22 +241,23 @@ namespace Midity
                     return new UnknownMetaEvent(ticks, eventNumber, reader.ReadBytes(length));
             }
         }
+
         static MTrkEvent ReadSysExEvent(uint ticks, MidiDataStreamReader reader)
         {
             var length = reader.ReadMultiByteValue() - 1;
             var bytes = new byte[length];
-            
+
             for (var i = 0; i < length; i++)
                 bytes[i] = reader.ReadByte();
-            
-            if(reader.ReadByte() == 0xf7)
+
+            if (reader.ReadByte() == 0xf7)
                 return new SysExEvent(ticks, bytes);
             throw new Exception();
         }
-        
+
         static MTrkEvent ReadMidiEvent(uint ticks, byte stat, MidiDataStreamReader reader)
         {
-            var channel = (byte)(stat & 0x0f);
+            var channel = (byte) (stat & 0x0f);
             if ((stat & 0xf0) == 0xb0)
             {
                 var controlChangeNumber = reader.ReadByte();
@@ -206,10 +268,10 @@ namespace Midity
             {
                 var isNoteOn = (stat & 0xf0) == 0x90;
                 var noteNumber = reader.ReadByte();
-                var noteName = (NoteName)(noteNumber % 12);
-                var noteOctave = (NoteOctave)(noteNumber / 12);
-                var velocity = (stat & 0xe0u) == 0xc0u ? (byte)0 : reader.ReadByte();
-                return new NoteEvent(ticks,isNoteOn,channel,noteName,noteOctave,velocity);
+                var noteName = (NoteName) (noteNumber % 12);
+                var noteOctave = (NoteOctave) (noteNumber / 12);
+                var velocity = (stat & 0xe0u) == 0xc0u ? (byte) 0 : reader.ReadByte();
+                return new NoteEvent(ticks, isNoteOn, channel, noteName, noteOctave, velocity);
             }
         }
     }
