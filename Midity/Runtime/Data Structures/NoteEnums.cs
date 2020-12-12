@@ -67,6 +67,19 @@ namespace Midity
         ASharpMinor,
     }
 
+    public static class NoteEnumUtil
+    {
+        public static NoteName IntToNoteName(int noteNumber)
+        {
+            return (NoteName) (noteNumber % 12);
+        }
+
+        public static NoteOctave IntToNoteOctave(int noteNumber)
+        {
+            return (NoteOctave) (noteNumber / 12);
+        }
+    }
+
     public static class NoteKeyExtension
     {
         public static bool IsMajor(this NoteKey noteKey)
