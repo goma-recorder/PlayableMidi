@@ -26,21 +26,15 @@ namespace Midity.Playable
         public MTrkEventHolder<KeyEvent>[] keyEvents;
 
         MidiTrack _track;
-        MidiTrack Track
+
+        public MidiTrack Track
         {
             get
             {
                 if (_track != null)
                     return _track;
                 var mtrkEvents = new List<MTrkEvent>();
-                return _track = new MidiTrack()
-                {
-                    name = trackName,
-                    tempo = tempo,
-                    duration = duration,
-                    ticksPerQuarterNote = ticksPerQuarterNote,
-                    events = Translate(),
-                };
+                return _track = new MidiTrack(trackName, tempo, duration, ticksPerQuarterNote, Translate());
             }
         }
 
@@ -58,8 +52,8 @@ namespace Midity.Playable
             var keyIndex = 0;
             for (; listIndex < eventCount; listIndex++)
             {
-                Search(ref noteIndex,noteEvents);
-                Search(ref controlChangeIndex,controlChangeEvents);
+                Search(ref noteIndex, noteEvents);
+                Search(ref controlChangeIndex, controlChangeEvents);
                 Search(ref textIndex, textEvents);
                 Search(ref lyricIndex, lyricEvents);
                 Search(ref markerIndex, markerEvents);
@@ -67,6 +61,7 @@ namespace Midity.Playable
                 Search(ref beatIndex, beatEvents);
                 Search(ref keyIndex, keyEvents);
             }
+
             return list;
 
             void Search<T>(ref int index, MTrkEventHolder<T>[] events) where T : MTrkEvent
@@ -81,15 +76,17 @@ namespace Midity.Playable
         }
 
         MidiTrackPlayer _player;
+
         MidiTrackPlayer Player
         {
             get
             {
                 if (_player != null)
                     return _player;
-                return _player = new MidiTrackPlayer(Track,PushSignal);
+                return _player = new MidiTrackPlayer(Track, PushSignal, true);
             }
         }
+
         List<MTrkEvent> MtrkEvents => Track.events;
 
         #endregion
@@ -101,7 +98,7 @@ namespace Midity.Playable
         public float GetValue(UnityEngine.Playables.Playable playable, MidiControl control)
         {
             if (MtrkEvents == null) return 0;
-            var t = (float)playable.GetTime() % DurationInSecond;
+            var t = (float) playable.GetTime() % DurationInSecond;
             if (control.mode == MidiControl.Mode.NoteEnvelope)
                 return GetNoteEnvelopeValue(control, t);
             else if (control.mode == MidiControl.Mode.NoteCurve)
@@ -118,7 +115,7 @@ namespace Midity.Playable
 
         public override void OnGraphStart(UnityEngine.Playables.Playable playable)
         {
-            _previousTime = (float)playable.GetTime();
+            _previousTime = (float) playable.GetTime();
             Player.ResetHead(_previousTime);
         }
 
@@ -129,16 +126,16 @@ namespace Midity.Playable
             if (!playable.IsDone()) return;
             _playable = playable;
             _frameData = info;
-            Player.Play((float)playable.GetDuration());
+            Player.PlayByAbstractTime((float) playable.GetDuration());
         }
 
         public override void PrepareFrame(UnityEngine.Playables.Playable playable, FrameData info)
         {
             _playable = playable;
             _frameData = info;
-            var currentTime = (float)playable.GetTime();
+            var currentTime = (float) playable.GetTime();
             if (info.evaluationType == FrameData.EvaluationType.Playback)
-                Player.Play(currentTime);
+                Player.PlayByAbstractTime(currentTime);
             _previousTime = currentTime;
         }
 
@@ -152,7 +149,7 @@ namespace Midity.Playable
 
         void PushSignal(MTrkEvent mTrkEvent)
         {
-            _frameData.output.PushNotification(_playable,_signalPool.Allocate(mTrkEvent));
+            _frameData.output.PushNotification(_playable, _signalPool.Allocate(mTrkEvent));
         }
 
         #endregion
@@ -171,6 +168,7 @@ namespace Midity.Playable
                 if (time > tick) return (lastEvent, e);
                 lastEvent = e;
             }
+
             return (lastEvent, lastEvent);
         }
 
@@ -189,11 +187,13 @@ namespace Midity.Playable
                 {
                     eOn = e;
                     eOff = null;
-                } 
+                }
                 else eOff = e;
             }
+
             return (eOn, eOff);
         }
+
         #endregion
 
         #region Envelope generator
@@ -231,12 +231,12 @@ namespace Midity.Playable
         float GetNoteEnvelopeValue(MidiControl control, float time)
         {
             var tick = Track.ConvertSecondToTicks(time);
-            var (eOn,eOff) = GetNoteEventsBeforeTick(tick, control.noteFilter);
+            var (eOn, eOff) = GetNoteEventsBeforeTick(tick, control.noteFilter);
 
             if (eOn == null) return 0;
 
             // Note-on time
-             Track.GetAbstractTime(eOn,out var onTime);
+            Track.GetAbstractTime(eOn, out var onTime);
 
             // Note-off time
             var offTime = 0f;
@@ -259,12 +259,12 @@ namespace Midity.Playable
         float GetNoteCurveValue(MidiControl control, float time)
         {
             var tick = Track.ConvertSecondToTicks(time);
-            var (iOn,iOff) = GetNoteEventsBeforeTick(tick, control.noteFilter);
+            var (iOn, iOff) = GetNoteEventsBeforeTick(tick, control.noteFilter);
 
             if (iOn == null) return 0;
 
             // Note-on time
-            Track.GetAbstractTime(iOn ,out var onTime);
+            Track.GetAbstractTime(iOn, out var onTime);
 
             var curve = control.curve.Evaluate(Mathf.Max(0, time - onTime));
             var velocity = iOn.velocity / 127.0f;
@@ -275,7 +275,7 @@ namespace Midity.Playable
         float GetCCValue(MidiControl control, float time)
         {
             var tick = Track.ConvertSecondToTicks(time);
-            var (i0,i1) = GetCCEventIndexAroundTick(tick, control.ccNumber);
+            var (i0, i1) = GetCCEventIndexAroundTick(tick, control.ccNumber);
 
             if (i0 == null) return 0;
             if (i1 == null) return i0.data / 127.0f;

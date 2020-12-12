@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace Midity
 {
@@ -11,6 +12,18 @@ namespace Midity
         public uint duration;
         public uint ticksPerQuarterNote = 96;
         public List<MTrkEvent> events = new List<MTrkEvent>();
+        public uint AllTicks { get; private set; }
+        
+        public MidiTrack(string name, float tempo, uint duration, uint ticksPerQuarterNote, List<MTrkEvent> events)
+        {
+            this.name = name;
+            this.tempo = tempo;
+            this.duration = duration;
+            this.ticksPerQuarterNote = ticksPerQuarterNote;
+            this.events = events;
+            events.ForEach(x => AllTicks += x.ticks);
+        }
+        
         public float DurationInSecond
             => duration / tempo * 60 / ticksPerQuarterNote;
 

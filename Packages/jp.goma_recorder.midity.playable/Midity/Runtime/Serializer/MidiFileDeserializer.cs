@@ -85,14 +85,7 @@ namespace Midity
             }
 
             // Asset instantiation
-            return new MidiTrack
-            {
-                name = trackName,
-                tempo = tempo ?? 120f,
-                duration = bars * tpqn * 4,
-                ticksPerQuarterNote = tpqn,
-                events = events,
-            };
+            return new MidiTrack(trackName, tempo ?? 120f, bars * tpqn * 4, tpqn, events);
         }
 
         #endregion
