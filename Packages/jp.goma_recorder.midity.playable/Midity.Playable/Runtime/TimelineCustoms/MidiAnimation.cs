@@ -1,0 +1,210 @@
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using UnityEngine;
+using UnityEngine.Playables;
+using Debug = UnityEngine.Debug;
+
+namespace Midity.Playable
+{
+    // Runtime playable class that calculates MIDI based animation
+    public sealed class MidiAnimation : PlayableBehaviour
+    {
+        private readonly MidiAnimationAsset midiAnimationAsset;
+        private MidiTrack midiTrack => midiAnimationAsset.MidiTrack;
+
+        private readonly MidiTrackPlayer _trackPlayer;
+
+        public MidiAnimation()
+        {
+        }
+
+        internal MidiAnimation(MidiAnimationAsset midiAnimationAsset)
+        {
+            this.midiAnimationAsset = midiAnimationAsset;
+            _trackPlayer = new MidiTrackPlayer(this.midiTrack, PushSignal, true);
+        }
+
+        public float GetValue(UnityEngine.Playables.Playable playable, MidiControl control)
+        {
+            if (midiTrack.Events == null) return 0;
+            var t = (float) (playable.GetTime() % midiAnimationAsset.duration);
+            if (control.mode == MidiControl.Mode.NoteEnvelope)
+                return GetNoteEnvelopeValue(control, t);
+            if (control.mode == MidiControl.Mode.NoteCurve)
+                return GetNoteCurveValue(control, t);
+            // CC
+            return GetCCValue(control, t);
+        }
+
+        float _previousTime;
+
+        public override object Clone()
+        {
+            return new MidiAnimation(midiAnimationAsset);
+        }
+
+        public override void OnGraphStart(UnityEngine.Playables.Playable playable)
+        {
+            _previousTime = (float) playable.GetTime();
+            _trackPlayer.ResetHead(_previousTime);
+        }
+
+        public override void OnBehaviourPause(UnityEngine.Playables.Playable playable, FrameData info)
+        {
+            // When the playable is being finished, signals laying in the rest
+            // of the clip should be all triggered.
+            if (!playable.IsDone()) return;
+            _playable = playable;
+            _frameData = info;
+            var currentTime = (float) playable.GetDuration();
+            _trackPlayer.PlayByDeltaTime(_previousTime - currentTime);
+            _previousTime = currentTime;
+        }
+
+        public override void PrepareFrame(UnityEngine.Playables.Playable playable, FrameData info)
+        {
+            _playable = playable;
+            _frameData = info;
+            var currentTime = (float) playable.GetTime();
+            if (info.evaluationType == FrameData.EvaluationType.Playback)
+                _trackPlayer.PlayByDeltaTime(currentTime - _previousTime);
+            _previousTime = currentTime;
+        }
+
+        private MidiSignalPool _signalPool = new MidiSignalPool();
+        private UnityEngine.Playables.Playable _playable;
+        private FrameData _frameData;
+
+        void PushSignal(MTrkEvent mTrkEvent)
+        {
+            _frameData.output.PushNotification(_playable, _signalPool.Allocate(mTrkEvent));
+        }
+
+        (ControlChangeEvent i0, ControlChangeEvent i1) GetCCEventIndexAroundTick(uint tick, int ccNumber)
+        {
+            var time = 0u;
+            ControlChangeEvent lastEvent = null;
+            foreach (var mEvent in midiTrack.Events)
+            {
+                time += mEvent.ticks;
+                if (!(mEvent is ControlChangeEvent e)) continue;
+                if (e.controlChangeNumber != ccNumber) continue;
+                if (time > tick) return (lastEvent, e);
+                lastEvent = e;
+            }
+
+            return (lastEvent, lastEvent);
+        }
+
+        (NoteEvent iOn, NoteEvent iOff) GetNoteEventsBeforeTick(uint tick, MidiNoteFilter note)
+        {
+            NoteEvent eOn = null;
+            NoteEvent eOff = null;
+            var time = 0u;
+            foreach (var mEvent in midiTrack.Events)
+            {
+                time += mEvent.ticks;
+                if (!(mEvent is NoteEvent e)) continue;
+                if (time > tick) break;
+                if (!note.Check(e)) continue;
+                if (e.isNoteOn)
+                {
+                    eOn = e;
+                    eOff = null;
+                }
+                else eOff = e;
+            }
+
+            return (eOn, eOff);
+        }
+
+        float CalculateEnvelope(MidiEnvelope envelope, float onTime, float offTime)
+        {
+            var attackTime = envelope.AttackTime;
+            var attackRate = 1 / attackTime;
+
+            var decayTime = envelope.DecayTime;
+            var decayRate = 1 / decayTime;
+
+            var level = -offTime / envelope.ReleaseTime;
+
+            if (onTime < attackTime)
+            {
+                level += onTime * attackRate;
+            }
+            else if (onTime < attackTime + decayTime)
+            {
+                level += 1 - (onTime - attackTime) * decayRate * (1 - envelope.SustainLevel);
+            }
+            else
+            {
+                level += envelope.SustainLevel;
+            }
+
+            return Mathf.Max(0, level);
+        }
+
+        float GetNoteEnvelopeValue(MidiControl control, float time)
+        {
+            var tick = midiTrack.ConvertSecondToTicks(time);
+            var (eOn, eOff) = GetNoteEventsBeforeTick(tick, control.noteFilter);
+
+            if (eOn == null) return 0;
+
+            // Note-on time
+            midiTrack.GetAbstractTime(eOn, out var onTime);
+
+            // Note-off time
+            var offTime = 0f;
+            if (eOff != null)
+                midiTrack.GetAbstractTime(eOff, out offTime);
+            else
+                offTime = time;
+
+            var envelope = CalculateEnvelope(
+                control.envelope,
+                Mathf.Max(0, offTime - onTime),
+                Mathf.Max(0, time - offTime)
+            );
+
+            var velocity = eOn.velocity / 127.0f;
+
+            return envelope * velocity;
+        }
+
+        float GetNoteCurveValue(MidiControl control, float time)
+        {
+            var tick = midiTrack.ConvertSecondToTicks(time);
+            var (iOn, iOff) = GetNoteEventsBeforeTick(tick, control.noteFilter);
+
+            if (iOn == null) return 0;
+
+            // Note-on time
+            midiTrack.GetAbstractTime(iOn, out var onTime);
+
+            var curve = control.curve.Evaluate(Mathf.Max(0, time - onTime));
+            var velocity = iOn.velocity / 127.0f;
+
+            return curve * velocity;
+        }
+
+        float GetCCValue(MidiControl control, float time)
+        {
+            var tick = midiTrack.ConvertSecondToTicks(time);
+            var (i0, i1) = GetCCEventIndexAroundTick(tick, control.ccNumber);
+
+            if (i0 == null) return 0;
+            if (i1 == null) return i0.data / 127.0f;
+
+            midiTrack.GetAbstractTime(i0, out var t0);
+            midiTrack.GetAbstractTime(i1, out var t1);
+
+            var v0 = i0.data / 127.0f;
+            var v1 = i1.data / 127.0f;
+
+            return Mathf.Lerp(v0, v1, Mathf.Clamp01((time - t0) / (t1 - t0)));
+        }
+    }
+}

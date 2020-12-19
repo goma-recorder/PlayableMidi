@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System;
+using System.Collections.Generic;
 
 namespace Midity
 {
@@ -10,18 +11,24 @@ namespace Midity
         [SerializeField] 
         private uint _tickTempo;
 
-        public uint tickTempo
+        public uint TickTempo
         {
             get => _tickTempo;
             set => _tickTempo = Math.Min(Math.Max(0u, value), 0xff_ff_ff);
         }
-        public float tempo => 60000000f / tickTempo;
+        public float Tempo => 60000000f / TickTempo;
         
         public TempoEvent(){}
 
         public TempoEvent(uint ticks, uint tickTempo):base(ticks)
         {
-            this.tickTempo = tickTempo;
+            TickTempo = tickTempo;
+        }
+
+        protected override Type ToString(List<string> list)
+        {
+            list.Add(Tempo.ToString());
+            return typeof(TempoEvent);
         }
     }
 }

@@ -1,4 +1,7 @@
-﻿namespace Midity
+﻿using System;
+using System.Collections.Generic;
+
+namespace Midity
 {
     [System.Serializable]
     public sealed class EndPointEvent : MTrkEvent
@@ -7,5 +10,10 @@
 
         public EndPointEvent(){}
         public EndPointEvent(uint ticks):base(ticks){}
+
+        protected override Type ToString(List<string> list)
+        {
+            return typeof(EndPointEvent);
+        }
     }
 }

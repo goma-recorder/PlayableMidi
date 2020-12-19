@@ -1,5 +1,5 @@
 using System;
-using System.Collections.Generic;
+using System.Text;
 
 namespace Midity
 {
@@ -8,17 +8,17 @@ namespace Midity
     {
         #region Internal members
 
-        readonly byte[] _data;
-        private readonly int _codepage;
+        private readonly byte[] _data;
+        private readonly Encoding _encoding;
 
         #endregion
 
         #region Constructor
 
-        public MidiDataStreamReader(byte[] data,int codepage)
+        public MidiDataStreamReader(byte[] data, Encoding encoding)
         {
             _data = data;
-            _codepage = codepage;
+            _encoding = encoding;
         }
 
         #endregion
@@ -49,14 +49,14 @@ namespace Midity
         public byte[] ReadBytes(uint len)
         {
             var bytes = new byte[len];
-            Buffer.BlockCopy(_data, (int)Position, bytes, 0, (int)len);
+            Buffer.BlockCopy(_data, (int) Position, bytes, 0, (int) len);
             Position += len;
             return bytes;
         }
 
         public string ReadChars(uint length)
         {
-            return System.Text.Encoding.GetEncoding(_codepage).GetString(ReadBytes(length));
+            return _encoding.GetString(ReadBytes(length));
         }
 
         public uint ReadBEUInt(byte length)
@@ -64,9 +64,22 @@ namespace Midity
             var number = 0u;
             for (byte i = 0; i < length; i++)
             {
-                number += (uint)ReadByte() << (length - i - 1) * 8;
+                number += (uint) ReadByte() << (length - i - 1) * 8;
             }
+
             return number;
+        }
+
+        public short ReadBEShort()
+        {
+            var bytes = ReadBytes(2);
+            return (short) (bytes[0] << 8 + bytes[1]);
+        }
+
+        public ushort ReadBEUShort()
+        {
+            var bytes = ReadBytes(2);
+            return (ushort) (bytes[0] << 8 + bytes[1]);
         }
 
         public uint ReadMultiByteValue()
@@ -79,6 +92,7 @@ namespace Midity
                 if (b < 0x80u) break;
                 v <<= 7;
             }
+
             return v;
         }
 
@@ -94,6 +108,7 @@ namespace Midity
                 if (b < 0x80u) break;
                 v <<= 7;
             }
+
             return v;
         }
 

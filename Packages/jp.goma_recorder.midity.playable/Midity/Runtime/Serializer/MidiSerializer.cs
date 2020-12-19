@@ -22,7 +22,7 @@ namespace Midity
                 case NoteEvent noteEvent:
                     WriteTicks(3);
                     bytes[offset] = noteEvent.Status;
-                    bytes[++offset] = noteEvent.NoteNumber;
+                    bytes[++offset] = noteEvent.noteNumber;
                     bytes[++offset] = noteEvent.velocity;
                     offset++;
                     return bytes;
@@ -83,9 +83,9 @@ namespace Midity
                     bytes[offset] = 0xff;
                     bytes[++offset] = TempoEvent.EventNumber;
                     bytes[++offset] = 3;
-                    bytes[++offset] = (byte) ((tempoEvent.tickTempo >> 16) & 0xff);
-                    bytes[++offset] = (byte) ((tempoEvent.tickTempo >> 8) & 0xff);
-                    bytes[++offset] = (byte) (tempoEvent.tickTempo & 0xff);
+                    bytes[++offset] = (byte) ((tempoEvent.TickTempo >> 16) & 0xff);
+                    bytes[++offset] = (byte) ((tempoEvent.TickTempo >> 8) & 0xff);
+                    bytes[++offset] = (byte) (tempoEvent.TickTempo & 0xff);
                     offset++;
                     return bytes;
                 case SmpteOffsetEvent smpteOffsetEvent:

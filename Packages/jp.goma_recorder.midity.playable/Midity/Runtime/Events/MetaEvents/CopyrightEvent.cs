@@ -1,4 +1,8 @@
-﻿namespace Midity
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace Midity
 {
     [System.Serializable]
     public sealed class CopyrightEvent : MTrkEvent
@@ -10,6 +14,12 @@
         public CopyrightEvent(uint ticks, string text) : base(ticks)
         {
             this.text = text;
+        }
+
+        protected override Type ToString(List<string> list)
+        {
+            list.Add(text);
+            return typeof(CopyrightEvent);
         }
     }
 }

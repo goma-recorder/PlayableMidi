@@ -1,4 +1,7 @@
-﻿namespace Midity
+﻿using System;
+using System.Collections.Generic;
+
+namespace Midity
 {
     [System.Serializable]
     public sealed class MarkerEvent : MTrkEvent
@@ -11,6 +14,12 @@
         public MarkerEvent(uint ticks, string text) : base(ticks)
         {
             this.text = text;
+        }
+
+        protected override Type ToString(List<string> list)
+        {
+            list.Add(text);
+            return typeof(MarkerEvent);
         }
     }
 }
