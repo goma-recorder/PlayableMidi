@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
+using System.Text;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
@@ -14,7 +15,7 @@ namespace Midity.Tests
         {
             var serializer = new MidiSerializer(932);
             var bytes = serializer.SerializeEvent(mTrkEvent);
-            var reader = new MidiDataStreamReader(bytes,932);
+            var reader = new MidiDataStreamReader(bytes,Encoding.GetEncoding("shift_jis"));
             var status = (byte)0;
             return (T)MidiFileDeserializer.ReadEvent(reader,ref status);
         }
@@ -194,7 +195,7 @@ namespace Midity.Tests
             var y = Redeserialize(x);
             
             Assert.That(x.ticks == y.ticks);
-            Assert.That(x.tickTempo == y.tickTempo);
+            Assert.That(x.TickTempo == y.TickTempo);
         }
 
         [Test]

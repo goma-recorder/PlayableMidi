@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Midity
@@ -24,6 +25,13 @@ namespace Midity
             Channel = channel;
             this.controlChangeNumber = controlChangeNumber;
             this.data = data;
+        }
+
+        protected override Type ToString(List<string> list)
+        {
+            list.Add(controlChangeNumber.ToString());
+            list.Add(data.ToString());
+            return typeof(ControlChangeEvent);
         }
     }
 }

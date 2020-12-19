@@ -1,4 +1,7 @@
-﻿namespace Midity
+﻿using System;
+using System.Collections.Generic;
+
+namespace Midity
 {
     [System.Serializable]
     public sealed class SmpteOffsetEvent : MTrkEvent
@@ -19,6 +22,11 @@
             this.se = se;
             this.fr = fr;
             this.ff = ff;
+        }
+
+        protected override Type ToString(List<string> list)
+        {
+            return typeof(SmpteOffsetEvent);
         }
     }
 }

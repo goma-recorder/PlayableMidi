@@ -1,4 +1,7 @@
-﻿namespace Midity
+﻿using System;
+using System.Collections.Generic;
+
+namespace Midity
 {
     [System.Serializable]
     public sealed class BeatEvent : MTrkEvent
@@ -18,6 +21,11 @@
             this.dd = dd;
             this.cc = cc;
             this.bb = bb;
+        }
+
+        protected override Type ToString(List<string> list)
+        {
+            return typeof(BeatEvent);
         }
     }
 }

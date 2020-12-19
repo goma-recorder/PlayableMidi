@@ -6,12 +6,12 @@ namespace Midity.Playable
 
     #region Control parameter types
 
-    public enum MidiNote
+    public enum NoteNameFilter
     {
         All, C, CSharp, D, DSharp, E, F, FSharp, G, GSharp, A, ASharp, B
     }
 
-    public enum MidiOctave
+    public enum OctaveFilter
     {
         All, Minus2, Minus1, Zero, Plus1, Plus2, Plus3, Plus4, Plus5, Plus6, Plus7, Plus8
     }
@@ -19,8 +19,8 @@ namespace Midity.Playable
     [System.Serializable]
     public struct MidiNoteFilter
     {
-        public MidiNote note;
-        public MidiOctave octave;
+        public NoteNameFilter noteNameFilter;
+        public OctaveFilter octaveFilter;
 
         public bool Check(MTrkEvent e)
         {
@@ -44,8 +44,8 @@ namespace Midity.Playable
         }
         public bool Check(NoteEvent e)
         {
-            return (octave == MidiOctave.All || (int)e.noteOctave == (int)octave - 1) &&
-                (note == MidiNote.All || (int)e.noteName == (int)note - 1);
+            return (octaveFilter == OctaveFilter.All || (int)e.noteOctave == (int)octaveFilter - 1) &&
+                (noteNameFilter == NoteNameFilter.All || (int)e.noteName == (int)noteNameFilter - 1);
         }
     }
 
@@ -84,8 +84,8 @@ namespace Midity.Playable
         // (Note mode) Note filter
         public MidiNoteFilter noteFilter = new MidiNoteFilter
         {
-            note = MidiNote.All,
-            octave = MidiOctave.All
+            noteNameFilter = NoteNameFilter.All,
+            octaveFilter = OctaveFilter.All
         };
 
         // (Note Envelope mode) Envelope parameters

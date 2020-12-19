@@ -1,4 +1,7 @@
-﻿namespace Midity
+﻿using System;
+using System.Collections.Generic;
+
+namespace Midity
 {
     [System.Serializable]
     public sealed class LyricEvent : MTrkEvent
@@ -11,6 +14,12 @@
         public LyricEvent(uint ticks, string lyric) : base(ticks)
         {
             this.lyric = lyric;
+        }
+
+        protected override Type ToString(List<string> list)
+        {
+            list.Add(lyric);
+            return typeof(LyricEvent);
         }
     }
 }

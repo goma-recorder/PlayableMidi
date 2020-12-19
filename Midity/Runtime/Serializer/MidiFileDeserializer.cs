@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Text;
+using UnityEngine;
 using static Midity.NoteKey;
 
 namespace Midity
@@ -9,9 +11,22 @@ namespace Midity
     {
         #region Public members
 
-        public static MidiTrack[] Load(byte[] data)
+        public static MidiFile Load(byte[] data, string codeName)
         {
-            var reader = new MidiDataStreamReader(data, 932);
+            var encoding = Encoding.GetEncoding(codeName);
+            return Load(data, encoding);
+        }
+
+        public static MidiFile Load(byte[] data, int codePage)
+        {
+            var encoding = Encoding.GetEncoding(codePage);
+            return Load(data, encoding);
+        }
+
+        public static MidiFile Load(byte[] data, Encoding encoding = null)
+        {
+            if (encoding == null) encoding = Encoding.ASCII;
+            var reader = new MidiDataStreamReader(data, encoding);
 
             // Chunk type
             if (reader.ReadChars(4) != "MThd")
@@ -22,7 +37,7 @@ namespace Midity
                 throw new FormatException("Length of header chunk must be 6.");
 
             // Format (unused)
-            reader.Advance(2);
+            var format = (byte) reader.ReadBEUShort();
 
             // Number of tracks
             var trackCount = reader.ReadBEUInt(2);
@@ -33,19 +48,18 @@ namespace Midity
                 throw new FormatException("SMPTE time code is not supported.");
 
             // Tracks
-            var tracks = new MidiTrack[trackCount];
-            float? tempo = null;
+            var midiFile = new MidiFile(format, tpqn, encoding.CodePage);
             for (var i = 0; i < trackCount; i++)
-                tracks[i] = ReadTrack(reader, tpqn, ref tempo);
+                ReadTrack(i, midiFile, reader);
 
-            return tracks;
+            return midiFile;
         }
 
         #endregion
 
         #region Private members
 
-        static MidiTrack ReadTrack(MidiDataStreamReader reader, uint tpqn, ref float? tempo)
+        static void ReadTrack(int trackNumber, MidiFile midiFile, MidiDataStreamReader reader)
         {
             // Chunk type
             if (reader.ReadChars(4) != "MTrk")
@@ -53,22 +67,20 @@ namespace Midity
 
             // Chunk length
             var chunkEnd = reader.ReadBEUInt(4);
+            var l = reader.Position - chunkEnd;
             chunkEnd += reader.Position;
 
             // MIDI event sequence
             var events = new List<MTrkEvent>();
-            var allTicks = 0u;
             byte stat = 0;
 
             while (reader.Position < chunkEnd)
             {
                 var mtrkEvent = ReadEvent(reader, ref stat);
-                allTicks += mtrkEvent.ticks;
                 events.Add(mtrkEvent);
             }
 
             // Quantize duration with bars.
-            var bars = (allTicks + tpqn * 4 - 1) / (tpqn * 4);
             var trackName = "";
             foreach (var e in events)
             {
@@ -77,15 +89,10 @@ namespace Midity
                     case TrackNameEvent trackNameEvent:
                         trackName = trackNameEvent.name;
                         break;
-                    case TempoEvent tempoEvent:
-                        if (tempo == null)
-                            tempo = tempoEvent.tempo;
-                        break;
                 }
             }
 
-            // Asset instantiation
-            return new MidiTrack(trackName, tempo ?? 120f, bars * tpqn * 4, tpqn, events);
+            midiFile.AddTrack(trackNumber, events);
         }
 
         #endregion
@@ -259,12 +266,10 @@ namespace Midity
             }
             else
             {
-                var isNoteOn = (stat & 0xf0) == 0x90;
                 var noteNumber = reader.ReadByte();
-                var noteName = (NoteName) (noteNumber % 12);
-                var noteOctave = (NoteOctave) (noteNumber / 12);
                 var velocity = (stat & 0xe0u) == 0xc0u ? (byte) 0 : reader.ReadByte();
-                return new NoteEvent(ticks, isNoteOn, channel, noteName, noteOctave, velocity);
+                var isNoteOn = (stat & 0xf0) == 0x90 && velocity != 0;
+                return new NoteEvent(ticks, isNoteOn, channel, noteNumber, velocity);
             }
         }
     }

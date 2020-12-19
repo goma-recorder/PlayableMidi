@@ -1,4 +1,7 @@
-﻿namespace Midity
+﻿using System;
+using System.Collections.Generic;
+
+namespace Midity
 {
     [System.Serializable]
     public sealed class TrackNameEvent : MTrkEvent
@@ -11,6 +14,17 @@
         public TrackNameEvent(uint ticks, string name) : base(ticks)
         {
             this.name = name;
+        }
+
+        protected override Type ToString(List<string> list)
+        {
+            list.Add(name);
+            return typeof(TrackNameEvent);
+        }
+
+        public override string ToString()
+        {
+            return base.ToString();
         }
     }
 }

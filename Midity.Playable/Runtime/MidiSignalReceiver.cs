@@ -12,8 +12,8 @@ namespace Midity.Playable
     {
         public MidiNoteFilter noteFilter = new MidiNoteFilter
         {
-            note = MidiNote.All,
-            octave = MidiOctave.All
+            noteNameFilter = NoteNameFilter.All,
+            octaveFilter = OctaveFilter.All
         };
 
         public UnityEvent noteOnEvent = new UnityEvent();
