@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -7,7 +8,7 @@ namespace Midity.Playable
     // ControlAction class that invokes a property setter implemented in a
     // given target component.
     //
-    abstract class ControlAction
+    internal abstract class ControlAction
     {
         public static ControlAction
             CreateAction(object target, string propertyName)
@@ -34,12 +35,12 @@ namespace Midity.Playable
         protected static UnityAction<T>
             GetPropertySetter<T>(object target, string propertyName)
         {
-            return (UnityAction<T>)System.Delegate.CreateDelegate
+            return (UnityAction<T>) Delegate.CreateDelegate
                 (typeof(UnityAction<T>), target, "set_" + propertyName);
         }
     }
 
-    class FloatAction : ControlAction
+    internal class FloatAction : ControlAction
     {
         public UnityAction<float> action;
 
@@ -48,10 +49,13 @@ namespace Midity.Playable
             action = GetPropertySetter<float>(target, propertyName);
         }
 
-        public override void Invoke(Vector4 param) { action(param.x); }
+        public override void Invoke(Vector4 param)
+        {
+            action(param.x);
+        }
     }
 
-    class Vector3Action : ControlAction
+    internal class Vector3Action : ControlAction
     {
         public UnityAction<Vector3> action;
 
@@ -60,10 +64,13 @@ namespace Midity.Playable
             action = GetPropertySetter<Vector3>(target, propertyName);
         }
 
-        public override void Invoke(Vector4 param) { action((Vector3)param); }
+        public override void Invoke(Vector4 param)
+        {
+            action(param);
+        }
     }
 
-    class QuaternionAction : ControlAction
+    internal class QuaternionAction : ControlAction
     {
         public UnityAction<Quaternion> action;
 
@@ -72,10 +79,13 @@ namespace Midity.Playable
             action = GetPropertySetter<Quaternion>(target, propertyName);
         }
 
-        public override void Invoke(Vector4 param) { action(Quaternion.Euler(param)); }
+        public override void Invoke(Vector4 param)
+        {
+            action(Quaternion.Euler(param));
+        }
     }
 
-    class ColorAction : ControlAction
+    internal class ColorAction : ControlAction
     {
         public UnityAction<Color> action;
 
@@ -84,6 +94,9 @@ namespace Midity.Playable
             action = GetPropertySetter<Color>(target, propertyName);
         }
 
-        public override void Invoke(Vector4 param) { action((Color)param); }
+        public override void Invoke(Vector4 param)
+        {
+            action(param);
+        }
     }
 }

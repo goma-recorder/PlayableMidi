@@ -1,19 +1,19 @@
-using UnityEngine;
 using UnityEditor;
 using UnityEditor.Timeline;
+using UnityEngine;
 
 namespace Midity.Playable.Editor
 {
     // Custom inspector for MIDI animation tracks
     // It provides a UI for editing track controls.
     [CustomEditor(typeof(MidiAnimationTrack))]
-    class MidiAnimationTrackEditor : UnityEditor.Editor
+    internal class MidiAnimationTrackEditor : UnityEditor.Editor
     {
         #region Editor implementation
 
-        SerializedProperty _controls;
+        private SerializedProperty _controls;
 
-        void OnEnable()
+        private void OnEnable()
         {
             _controls = serializedObject.FindProperty("template.controls");
         }
@@ -63,7 +63,7 @@ namespace Midity.Playable.Editor
 
         #region Editor helper methods
 
-        void AppendDefaultMidiControl()
+        private void AppendDefaultMidiControl()
         {
             // Expand the array via SerializedProperty.
             var index = _controls.arraySize;
@@ -75,13 +75,13 @@ namespace Midity.Playable.Editor
             serializedObject.ApplyModifiedProperties();
 
             // Set a new control instance.
-            var track = (MidiAnimationTrack)target;
+            var track = (MidiAnimationTrack) target;
             var controls = track.template.controls;
             Undo.RecordObject(track, "Add MIDI Control");
             controls[controls.Length - 1] = new MidiControl();
         }
 
-        void CopyControl(MidiControl src, MidiControl dst, bool updateGuid)
+        private void CopyControl(MidiControl src, MidiControl dst, bool updateGuid)
         {
             // Copy MidiControl members.
             // Is there any smarter way to do this?
@@ -106,14 +106,16 @@ namespace Midity.Playable.Editor
             }
             else
                 // Simply copy targetComponent.
+            {
                 dst.targetComponent = src.targetComponent;
+            }
         }
 
         #endregion
 
         #region Context menu
 
-        static class Labels
+        private static class Labels
         {
             public static readonly GUIContent MoveUp = new GUIContent("Move Up");
             public static readonly GUIContent MoveDown = new GUIContent("Move Down");
@@ -123,9 +125,9 @@ namespace Midity.Playable.Editor
             public static readonly GUIContent Paste = new GUIContent("Paste");
         }
 
-        static MidiControl _clipboard = new MidiControl();
+        private static readonly MidiControl _clipboard = new MidiControl();
 
-        void OnContextClick(Vector2 pos, int index)
+        private void OnContextClick(Vector2 pos, int index)
         {
             var menu = new GenericMenu();
 
@@ -155,7 +157,7 @@ namespace Midity.Playable.Editor
             menu.DropDown(new Rect(pos, Vector2.zero));
         }
 
-        void OnMoveControl(int src, int dst)
+        private void OnMoveControl(int src, int dst)
         {
             serializedObject.Update();
             _controls.MoveArrayElement(src, dst);
@@ -164,15 +166,15 @@ namespace Midity.Playable.Editor
             // TimelineEditor.Refresh(RefreshReason.ContentsModified);
         }
 
-        void OnResetControl(int index)
+        private void OnResetControl(int index)
         {
-            var track = (MidiAnimationTrack)target;
+            var track = (MidiAnimationTrack) target;
             Undo.RecordObject(track, "Reset MIDI Control");
             track.template.controls[index] = new MidiControl();
             TimelineEditor.Refresh(RefreshReason.ContentsModified);
         }
 
-        void OnRemoveControl(int index)
+        private void OnRemoveControl(int index)
         {
             serializedObject.Update();
             _controls.DeleteArrayElementAtIndex(index);
@@ -180,16 +182,16 @@ namespace Midity.Playable.Editor
             TimelineEditor.Refresh(RefreshReason.ContentsModified);
         }
 
-        void OnCopyControl(int index)
+        private void OnCopyControl(int index)
         {
-            var track = (MidiAnimationTrack)target;
+            var track = (MidiAnimationTrack) target;
             Undo.RecordObject(track, "Copy MIDI Control");
             CopyControl(track.template.controls[index], _clipboard, false);
         }
 
-        void OnPasteControl(int index)
+        private void OnPasteControl(int index)
         {
-            var track = (MidiAnimationTrack)target;
+            var track = (MidiAnimationTrack) target;
             Undo.RecordObject(track, "Paste MIDI Control");
             CopyControl(_clipboard, track.template.controls[index], true);
             TimelineEditor.Refresh(RefreshReason.ContentsModified);

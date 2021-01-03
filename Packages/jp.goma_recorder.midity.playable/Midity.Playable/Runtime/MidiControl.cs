@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace Midity.Playable
@@ -8,15 +9,38 @@ namespace Midity.Playable
 
     public enum NoteNameFilter
     {
-        All, C, CSharp, D, DSharp, E, F, FSharp, G, GSharp, A, ASharp, B
+        All,
+        C,
+        CSharp,
+        D,
+        DSharp,
+        E,
+        F,
+        FSharp,
+        G,
+        GSharp,
+        A,
+        ASharp,
+        B
     }
 
     public enum OctaveFilter
     {
-        All, Minus2, Minus1, Zero, Plus1, Plus2, Plus3, Plus4, Plus5, Plus6, Plus7, Plus8
+        All,
+        Minus2,
+        Minus1,
+        Zero,
+        Plus1,
+        Plus2,
+        Plus3,
+        Plus4,
+        Plus5,
+        Plus6,
+        Plus7,
+        Plus8
     }
 
-    [System.Serializable]
+    [Serializable]
     public struct MidiNoteFilter
     {
         public NoteNameFilter noteNameFilter;
@@ -26,9 +50,9 @@ namespace Midity.Playable
         {
             if (e is NoteEvent midiEvent)
                 return Check(midiEvent);
-            else
-                return false;
+            return false;
         }
+
         public bool Check(MTrkEvent e, out NoteEvent noteEvent)
         {
             if (e is NoteEvent ne)
@@ -36,20 +60,19 @@ namespace Midity.Playable
                 noteEvent = ne;
                 return Check(ne);
             }
-            else
-            {
-                noteEvent = null;
-                return false;
-            }
+
+            noteEvent = null;
+            return false;
         }
+
         public bool Check(NoteEvent e)
         {
-            return (octaveFilter == OctaveFilter.All || (int)e.noteOctave == (int)octaveFilter - 1) &&
-                (noteNameFilter == NoteNameFilter.All || (int)e.noteName == (int)noteNameFilter - 1);
+            return (octaveFilter == OctaveFilter.All || (int) e.NoteOctave == (int) octaveFilter - 1) &&
+                   (noteNameFilter == NoteNameFilter.All || (int) e.NoteName == (int) noteNameFilter - 1);
         }
     }
 
-    [System.Serializable]
+    [Serializable]
     public struct MidiEnvelope
     {
         // ADSR parameters
@@ -59,26 +82,31 @@ namespace Midity.Playable
         public float release;
 
         // Times in seconds
-        public float AttackTime { get { return Mathf.Max(1e-5f, attack / 10); } }
-        public float DecayTime { get { return Mathf.Max(1e-5f, decay / 10); } }
-        public float ReleaseTime { get { return Mathf.Max(1e-5f, release / 10); } }
+        public float AttackTime => Mathf.Max(1e-5f, attack / 10);
+        public float DecayTime => Mathf.Max(1e-5f, decay / 10);
+        public float ReleaseTime => Mathf.Max(1e-5f, release / 10);
 
         // Normalized sustain level value
-        public float SustainLevel { get { return Mathf.Clamp01(sustain); } }
+        public float SustainLevel => Mathf.Clamp01(sustain);
     }
 
     #endregion
 
     #region Serializable MIDI control class
 
-    [System.Serializable]
+    [Serializable]
     public sealed class MidiControl
     {
+        // Control mode (Note/CC)
+        public enum Mode
+        {
+            NoteEnvelope,
+            NoteCurve,
+            CC
+        }
+
         // Is this control enabled?
         public bool enabled = true;
-
-        // Control mode (Note/CC)
-        public enum Mode { NoteEnvelope, NoteCurve, CC }
         public Mode mode = Mode.NoteEnvelope;
 
         // (Note mode) Note filter

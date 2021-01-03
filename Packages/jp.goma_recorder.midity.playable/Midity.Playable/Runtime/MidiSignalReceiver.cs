@@ -23,7 +23,7 @@ namespace Midity.Playable
         public void OnNotify
             (UnityEngine.Playables.Playable origin, INotification notification, object context)
         {
-            var mtrkEvent = ((MidiSignal)notification).Event;
+            var mtrkEvent = ((MidiSignal) notification).Event;
             onFireEvent?.Invoke(mtrkEvent);
             if (noteFilter.Check(mtrkEvent, out var noteEvent))
                 (noteEvent.isNoteOn ? noteOnEvent : noteOffEvent).Invoke();

@@ -1,53 +1,14 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
-using UnityEditor.Timeline;
 using UnityEngine;
-using UnityEngine.Playables;
-using UnityEngine.Timeline;
 
 namespace Midity.Playable.Editor
 {
     // Property drawer implementation for MidiControl
-    sealed class MidiControlInternalDrawer
+    internal sealed class MidiControlInternalDrawer
     {
-        #region Public properties and methods
-
-        public MidiControlInternalDrawer(SerializedProperty property)
-        {
-            _mode       = property.FindPropertyRelative("mode");
-            _noteFilter = property.FindPropertyRelative("noteFilter");
-            _envelope   = property.FindPropertyRelative("envelope");
-            _curve      = property.FindPropertyRelative("curve");
-            _ccNumber   = property.FindPropertyRelative("ccNumber");
-
-            _targetComponent = property.FindPropertyRelative("targetComponent");
-            _propertyName    = property.FindPropertyRelative("propertyName");
-            _fieldName       = property.FindPropertyRelative("fieldName");
-
-            _vector0 = property.FindPropertyRelative("vector0");
-            _vector1 = property.FindPropertyRelative("vector1");
-        }
-
-        public Component TargetComponent {
-            get { return (Component)(_targetComponent.exposedReferenceValue); }
-        }
-
-        public void SetRect(Rect rect)
-        {
-            _baseRect = _rect = rect;
-
-            // We only use single-line height controls.
-            _rect.height = EditorGUIUtility.singleLineHeight;
-        }
-
-        public float GetTotalHeight()
-        {
-            return _rect.y - _baseRect.y;
-        }
-
-        #endregion
-
         #region Simple UI methods for offline editing
 
         public void DrawCommonSettings()
@@ -55,7 +16,7 @@ namespace Midity.Playable.Editor
             EditorGUI.PropertyField(_rect, _mode, _labelControlMode);
             MoveRectToNextLine();
 
-            if (_mode.enumValueIndex == (int)MidiControl.Mode.NoteEnvelope)
+            if (_mode.enumValueIndex == (int) MidiControl.Mode.NoteEnvelope)
             {
                 EditorGUI.PropertyField(_rect, _noteFilter, _labelNoteOctave);
                 MoveRectToNextLine();
@@ -65,7 +26,7 @@ namespace Midity.Playable.Editor
                 EditorGUI.PropertyField(r, _envelope);
                 _rect.y += r.height;
             }
-            else if (_mode.enumValueIndex == (int)MidiControl.Mode.NoteCurve)
+            else if (_mode.enumValueIndex == (int) MidiControl.Mode.NoteCurve)
             {
                 EditorGUI.PropertyField(_rect, _noteFilter, _labelNoteOctave);
                 MoveRectToNextLine();
@@ -85,70 +46,12 @@ namespace Midity.Playable.Editor
 
         #endregion
 
-        #region Detailed UI methods for online editing
-
-        public void DrawComponentSelector()
-        {
-            CacheSiblingComponents();
-
-            EditorGUI.indentLevel++;
-
-            // Component selection drop-down
-            EditorGUI.BeginChangeCheck();
-
-            var index = System.Array.IndexOf(_componentNames, TargetComponent.GetType().Name);
-            index = EditorGUI.Popup(_rect, "Component", index, _componentNames);
-
-            if (EditorGUI.EndChangeCheck())
-                _targetComponent.exposedReferenceValue =
-                    TargetComponent.gameObject.GetComponent(_componentNames[index]);
-
-            MoveRectToNextLine();
-            EditorGUI.indentLevel--;
-        }
-
-        public void DrawPropertySelector()
-        {
-            CachePropertiesInTargetComponent();
-
-            if (_propertyNames.Length == 0)
-            {
-                // There is no supported property in the component.
-                // Clear the property selection.
-                _propertyName.stringValue = "";
-                _fieldName.stringValue = "";
-            }
-            else
-            {
-                // Property selection drop-down
-                EditorGUI.BeginChangeCheck();
-
-                var index = System.Array.IndexOf(_propertyNames, _propertyName.stringValue);
-                index = EditorGUI.Popup(_rect, "Property", index, _propertyLabels);
-
-                if (index < 0)
-                {
-                    _propertyName.stringValue = "";
-                    _fieldName.stringValue = "";
-                }
-                else if (EditorGUI.EndChangeCheck())
-                {
-                    _propertyName.stringValue = _propertyNames[index];
-                    _fieldName.stringValue = _fieldNames[index];
-                }
-
-                MoveRectToNextLine();
-            }
-        }
-
-        #endregion
-
         #region Property option drawer
 
         public void DrawPropertyOptions()
         {
-            var pidx = System.Array.IndexOf(_propertyNames, _propertyName.stringValue);
-            var type = pidx < 0 ? null : (SerializedPropertyType?)_propertyTypes[pidx];
+            var pidx = Array.IndexOf(_propertyNames, _propertyName.stringValue);
+            var type = pidx < 0 ? null : (SerializedPropertyType?) _propertyTypes[pidx];
 
             var v0 = _vector0.vector4Value;
             var v1 = _vector1.vector4Value;
@@ -217,50 +120,143 @@ namespace Midity.Playable.Editor
 
         #endregion
 
+        #region Public properties and methods
+
+        public MidiControlInternalDrawer(SerializedProperty property)
+        {
+            _mode = property.FindPropertyRelative("mode");
+            _noteFilter = property.FindPropertyRelative("noteFilter");
+            _envelope = property.FindPropertyRelative("envelope");
+            _curve = property.FindPropertyRelative("curve");
+            _ccNumber = property.FindPropertyRelative("ccNumber");
+
+            _targetComponent = property.FindPropertyRelative("targetComponent");
+            _propertyName = property.FindPropertyRelative("propertyName");
+            _fieldName = property.FindPropertyRelative("fieldName");
+
+            _vector0 = property.FindPropertyRelative("vector0");
+            _vector1 = property.FindPropertyRelative("vector1");
+        }
+
+        public Component TargetComponent => (Component) _targetComponent.exposedReferenceValue;
+
+        public void SetRect(Rect rect)
+        {
+            _baseRect = _rect = rect;
+
+            // We only use single-line height controls.
+            _rect.height = EditorGUIUtility.singleLineHeight;
+        }
+
+        public float GetTotalHeight()
+        {
+            return _rect.y - _baseRect.y;
+        }
+
+        #endregion
+
+        #region Detailed UI methods for online editing
+
+        public void DrawComponentSelector()
+        {
+            CacheSiblingComponents();
+
+            EditorGUI.indentLevel++;
+
+            // Component selection drop-down
+            EditorGUI.BeginChangeCheck();
+
+            var index = Array.IndexOf(_componentNames, TargetComponent.GetType().Name);
+            index = EditorGUI.Popup(_rect, "Component", index, _componentNames);
+
+            if (EditorGUI.EndChangeCheck())
+                _targetComponent.exposedReferenceValue =
+                    TargetComponent.gameObject.GetComponent(_componentNames[index]);
+
+            MoveRectToNextLine();
+            EditorGUI.indentLevel--;
+        }
+
+        public void DrawPropertySelector()
+        {
+            CachePropertiesInTargetComponent();
+
+            if (_propertyNames.Length == 0)
+            {
+                // There is no supported property in the component.
+                // Clear the property selection.
+                _propertyName.stringValue = "";
+                _fieldName.stringValue = "";
+            }
+            else
+            {
+                // Property selection drop-down
+                EditorGUI.BeginChangeCheck();
+
+                var index = Array.IndexOf(_propertyNames, _propertyName.stringValue);
+                index = EditorGUI.Popup(_rect, "Property", index, _propertyLabels);
+
+                if (index < 0)
+                {
+                    _propertyName.stringValue = "";
+                    _fieldName.stringValue = "";
+                }
+                else if (EditorGUI.EndChangeCheck())
+                {
+                    _propertyName.stringValue = _propertyNames[index];
+                    _fieldName.stringValue = _fieldNames[index];
+                }
+
+                MoveRectToNextLine();
+            }
+        }
+
+        #endregion
+
         #region UI resources
 
-        static readonly GUIContent _labelControlMode = new GUIContent("Control Mode");
-        static readonly GUIContent _labelCCNumber = new GUIContent("CC Number");
-        static readonly GUIContent _labelTarget = new GUIContent("Target");
-        static readonly GUIContent _labelNoteOctave = new GUIContent("Note/Octave");
+        private static readonly GUIContent _labelControlMode = new GUIContent("Control Mode");
+        private static readonly GUIContent _labelCCNumber = new GUIContent("CC Number");
+        private static readonly GUIContent _labelTarget = new GUIContent("Target");
+        private static readonly GUIContent _labelNoteOctave = new GUIContent("Note/Octave");
 
         #endregion
 
         #region Private members
 
-        SerializedProperty _mode;
-        SerializedProperty _noteFilter;
-        SerializedProperty _envelope;
-        SerializedProperty _curve;
-        SerializedProperty _ccNumber;
+        private readonly SerializedProperty _mode;
+        private readonly SerializedProperty _noteFilter;
+        private readonly SerializedProperty _envelope;
+        private readonly SerializedProperty _curve;
+        private readonly SerializedProperty _ccNumber;
 
-        SerializedProperty _targetComponent;
-        SerializedProperty _propertyName;
-        SerializedProperty _fieldName;
+        private readonly SerializedProperty _targetComponent;
+        private readonly SerializedProperty _propertyName;
+        private readonly SerializedProperty _fieldName;
 
-        SerializedProperty _vector0;
-        SerializedProperty _vector1;
+        private readonly SerializedProperty _vector0;
+        private readonly SerializedProperty _vector1;
 
         // Used in component selection drop-down
-        string [] _componentNames;
-        GameObject _cachedGameObject;
+        private string[] _componentNames;
+        private GameObject _cachedGameObject;
 
         // Used in property selection drop-down
-        string [] _propertyNames = new string [0];
-        string [] _propertyLabels;
-        string [] _fieldNames;
-        SerializedPropertyType [] _propertyTypes;
-        System.Type _cachedComponentType;
+        private string[] _propertyNames = new string [0];
+        private string[] _propertyLabels;
+        private string[] _fieldNames;
+        private SerializedPropertyType[] _propertyTypes;
+        private Type _cachedComponentType;
 
-        Rect _baseRect;
-        Rect _rect;
+        private Rect _baseRect;
+        private Rect _rect;
 
-        void MoveRectToNextLine()
+        private void MoveRectToNextLine()
         {
             _rect.y += EditorGUIUtility.singleLineHeight + 2;
         }
 
-        void MoveRectToNextLineInNarrowMode()
+        private void MoveRectToNextLineInNarrowMode()
         {
             if (!EditorGUIUtility.wideMode)
                 _rect.y += EditorGUIUtility.singleLineHeight;
@@ -268,24 +264,23 @@ namespace Midity.Playable.Editor
 
         // Enumerate components in the same game object that the target
         // component is attached to.
-        void CacheSiblingComponents()
+        private void CacheSiblingComponents()
         {
             var go = TargetComponent.gameObject;
             if (_cachedGameObject == go) return;
 
-            _componentNames = go.GetComponents<Component>().
-                Select(x => x.GetType().Name).ToArray();
+            _componentNames = go.GetComponents<Component>().Select(x => x.GetType().Name).ToArray();
 
             _cachedGameObject = go;
         }
 
         // Enumerate properties in the target component.
-        void CachePropertiesInTargetComponent()
+        private void CachePropertiesInTargetComponent()
         {
             var componentType = TargetComponent.GetType();
             if (_cachedComponentType == componentType) return;
 
-            var itr = (new SerializedObject(TargetComponent)).GetIterator();
+            var itr = new SerializedObject(TargetComponent).GetIterator();
 
             var pnames = new List<string>();
             var labels = new List<string>();
@@ -335,12 +330,12 @@ namespace Midity.Playable.Editor
     // Custom property drawer for MidiControl
     // Provides a cache for instances of the drawer implementation.
     [CustomPropertyDrawer(typeof(MidiControl), true)]
-    sealed class MidiControlDrawer : PropertyDrawer
+    internal sealed class MidiControlDrawer : PropertyDrawer
     {
-        Dictionary<string, MidiControlInternalDrawer>
+        private readonly Dictionary<string, MidiControlInternalDrawer>
             _drawers = new Dictionary<string, MidiControlInternalDrawer>();
 
-        MidiControlInternalDrawer GetCachedDrawer(SerializedProperty property)
+        private MidiControlInternalDrawer GetCachedDrawer(SerializedProperty property)
         {
             MidiControlInternalDrawer drawer;
 

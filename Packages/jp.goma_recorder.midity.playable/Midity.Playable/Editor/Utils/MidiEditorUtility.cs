@@ -2,7 +2,7 @@ using UnityEditor;
 
 namespace Midity.Playable.Editor
 {
-    static class MidiEditorUtility
+    internal static class MidiEditorUtility
     {
         //
         // Guess a property name from a given field name.
@@ -32,9 +32,9 @@ namespace Midity.Playable.Editor
             for (var i = 0; i < words.Length; i++)
             {
                 var w = words[i];
-                words[i] = (i == 0 ? System.Char.ToLower(w[0]) :
-                                     System.Char.ToUpper(w[0])) + w.Substring(1);
+                words[i] = (i == 0 ? char.ToLower(w[0]) : char.ToUpper(w[0])) + w.Substring(1);
             }
+
             name = string.Join("", words);
 
             // We know Unity has some spelling inconsistencies. Let us solve it.

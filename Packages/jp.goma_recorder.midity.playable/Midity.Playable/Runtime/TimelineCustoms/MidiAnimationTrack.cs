@@ -8,7 +8,7 @@ namespace Midity.Playable
     // assigned controls)
     [TrackColor(0.4f, 0.4f, 0.4f)]
     [TrackClipType(typeof(MidiAnimationAsset))]
-    [TrackBindingType(typeof(GameObject))]
+    [TrackBindingType(typeof(MidiSignalReceiver))]
     public sealed class MidiAnimationTrack : TrackAsset
     {
         #region Serialized object
@@ -19,7 +19,8 @@ namespace Midity.Playable
 
         #region TrackAsset implementation
 
-        public override UnityEngine.Playables.Playable CreateTrackMixer(PlayableGraph graph, GameObject go, int inputCount)
+        public override UnityEngine.Playables.Playable CreateTrackMixer(PlayableGraph graph, GameObject go,
+            int inputCount)
         {
             return ScriptPlayable<MidiAnimationMixer>.Create(graph, template, inputCount);
         }

@@ -5269,8 +5269,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   noteFilter:
-    note: 10
-    octave: 0
+    noteNameFilter: 10
+    octaveFilter: 0
   noteOnEvent:
     m_PersistentCalls:
       m_Calls:
@@ -5584,14 +5584,20 @@ PlayableDirector:
     value: {fileID: 557980237}
   - key: {fileID: 0}
     value: {fileID: 557980237}
-  - key: {fileID: -7602362627793905470, guid: 88ce1f001e166b449939d0f2b995d6e2, type: 2}
+  - key: {fileID: 0}
     value: {fileID: 268263652}
-  - key: {fileID: -1639593031897192355, guid: 88ce1f001e166b449939d0f2b995d6e2, type: 2}
-    value: {fileID: 557980237}
   - key: {fileID: 0}
     value: {fileID: 557980237}
   - key: {fileID: 0}
     value: {fileID: 557980237}
+  - key: {fileID: 0}
+    value: {fileID: 557980237}
+  - key: {fileID: 0}
+    value: {fileID: 557980238}
+  - key: {fileID: -3040198309612938654, guid: 88ce1f001e166b449939d0f2b995d6e2, type: 2}
+    value: {fileID: 268263652}
+  - key: {fileID: -3802363643312003199, guid: 88ce1f001e166b449939d0f2b995d6e2, type: 2}
+    value: {fileID: 557980238}
   m_ExposedReferences:
     m_References:
     - 5a8a1afac13373131b2dc4a56fd02466: {fileID: 0}
