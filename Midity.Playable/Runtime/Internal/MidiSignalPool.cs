@@ -1,13 +1,12 @@
-using UnityEngine;
 using System.Collections.Generic;
 
 namespace Midity.Playable
 {
     // Object pool class for MIDI signals
-    sealed class MidiSignalPool
+    internal sealed class MidiSignalPool
     {
-        Stack<MidiSignal> _usedSignals = new Stack<MidiSignal>();
-        Stack<MidiSignal> _freeSignals = new Stack<MidiSignal>();
+        private readonly Stack<MidiSignal> _freeSignals = new Stack<MidiSignal>();
+        private readonly Stack<MidiSignal> _usedSignals = new Stack<MidiSignal>();
 
         public MidiSignal Allocate(MTrkEvent data)
         {

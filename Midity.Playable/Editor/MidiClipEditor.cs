@@ -1,18 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Collections.Generic;
 using UnityEditor.Timeline;
 using UnityEngine;
 using UnityEngine.Timeline;
-using Debug = UnityEngine.Debug;
 
 namespace Midity.Playable.Editor
 {
     [CustomTimelineEditor(typeof(MidiAnimationAsset))]
     public class MidiClipEditor : ClipEditor
     {
-        private readonly Dictionary<TimelineClip, Texture> _textures = new Dictionary<TimelineClip, Texture>();
         private readonly Dictionary<TimelineClip, Material> _materials = new Dictionary<TimelineClip, Material>();
+        private readonly Dictionary<TimelineClip, Texture> _textures = new Dictionary<TimelineClip, Texture>();
 
         public override void DrawBackground(TimelineClip clip, ClipBackgroundRegion region)
         {
@@ -21,15 +18,20 @@ namespace Midity.Playable.Editor
 
             var midiTrack = midiAnimationAsset.MidiTrack;
 
+            if (midiTrack == null)
+                return;
+
             Texture texture;
             if (_textures.ContainsKey(clip) && _textures[clip] == null)
+            {
                 texture = _textures[clip];
+            }
             else
             {
                 const int topMargin = 2;
                 const int bottomMargin = 1;
                 texture = midiTrack.WriteNoteBarTexture2D(midiTrack.AllTicks,
-                    (int) midiTrack.TicksPerQuarterNote / 2, topMargin,
+                    (int) midiTrack.DeltaTime / 2, topMargin,
                     bottomMargin);
                 if (_textures.ContainsKey(clip))
                     _textures[clip] = texture;
@@ -39,12 +41,14 @@ namespace Midity.Playable.Editor
 
             Material material;
             if (_materials.ContainsKey(clip) && _materials[clip] == null)
+            {
                 material = _materials[clip];
+            }
             else
             {
                 var shader = Shader.Find("jp.goma_recorder.Midity.Playable/ClipBackground");
                 material = new Material(shader) {mainTexture = texture};
-                
+
                 if (_materials.ContainsKey(clip))
                     _materials[clip] = material;
                 else

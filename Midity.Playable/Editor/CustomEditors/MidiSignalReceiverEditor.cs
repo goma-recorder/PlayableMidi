@@ -1,19 +1,18 @@
-using UnityEngine;
 using UnityEditor;
+using UnityEngine;
 
 namespace Midity.Playable.Editor
 {
     // Custom inspector for MidiSignalReceiver
     [CustomEditor(typeof(MidiSignalReceiver))]
-    sealed class MidiSignalReceiverEditor : UnityEditor.Editor
+    internal sealed class MidiSignalReceiverEditor : UnityEditor.Editor
     {
-        SerializedProperty _noteFilter;
-        SerializedProperty _noteOnEvent;
-        SerializedProperty _noteOffEvent;
+        private static readonly GUIContent _labelNoteOctave = new GUIContent("Note/Octave");
+        private SerializedProperty _noteFilter;
+        private SerializedProperty _noteOffEvent;
+        private SerializedProperty _noteOnEvent;
 
-        static readonly GUIContent _labelNoteOctave = new GUIContent("Note/Octave");
-
-        void OnEnable()
+        private void OnEnable()
         {
             _noteFilter = serializedObject.FindProperty("noteFilter");
             _noteOnEvent = serializedObject.FindProperty("noteOnEvent");

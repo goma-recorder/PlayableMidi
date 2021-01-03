@@ -1,0 +1,17 @@
+{
+    "name": "goma_recorder.Midity.Editor",
+    "references": [
+        "GUID:44ae2b388f237fe40a9f1cd7775307f1"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

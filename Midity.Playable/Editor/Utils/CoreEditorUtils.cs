@@ -1,6 +1,6 @@
 using System;
-using UnityEngine;
 using UnityEditor;
+using UnityEngine;
 
 namespace Midity.Playable.Editor
 {
@@ -11,13 +11,13 @@ namespace Midity.Playable.Editor
     // dependency to the render pipelines package just for this purpose.
     //
 
-    static class CoreEditorStyles {
+    internal static class CoreEditorStyles
+    {
         public static readonly GUIStyle smallTickbox;
         public static readonly GUIStyle miniLabelButton;
 
-        static readonly Texture2D paneOptionsIconDark;
-        static readonly Texture2D paneOptionsIconLight;
-        public static Texture2D paneOptionsIcon { get { return EditorGUIUtility.isProSkin ? paneOptionsIconDark : paneOptionsIconLight; } }
+        private static readonly Texture2D paneOptionsIconDark;
+        private static readonly Texture2D paneOptionsIconLight;
 
         static CoreEditorStyles()
         {
@@ -44,12 +44,15 @@ namespace Midity.Playable.Editor
             miniLabelButton.onNormal = activeState;
             miniLabelButton.onActive = activeState;
 
-            paneOptionsIconDark = (Texture2D)EditorGUIUtility.Load("Builtin Skins/DarkSkin/Images/pane options.png");
-            paneOptionsIconLight = (Texture2D)EditorGUIUtility.Load("Builtin Skins/LightSkin/Images/pane options.png");
+            paneOptionsIconDark = (Texture2D) EditorGUIUtility.Load("Builtin Skins/DarkSkin/Images/pane options.png");
+            paneOptionsIconLight = (Texture2D) EditorGUIUtility.Load("Builtin Skins/LightSkin/Images/pane options.png");
         }
+
+        public static Texture2D paneOptionsIcon =>
+            EditorGUIUtility.isProSkin ? paneOptionsIconDark : paneOptionsIconLight;
     }
 
-    static class CoreEditorUtils
+    internal static class CoreEditorUtils
     {
         public static void DrawSplitter(bool isBoxed = false)
         {
@@ -73,10 +76,14 @@ namespace Midity.Playable.Editor
                 : new Color(0.12f, 0.12f, 0.12f, 1.333f));
         }
 
-        public static bool DrawHeaderToggle(string title, SerializedProperty group, SerializedProperty activeField, Action<Vector2> contextAction = null)
-            => DrawHeaderToggle(EditorGUIUtility.TrTextContent(title), group, activeField, contextAction);
+        public static bool DrawHeaderToggle(string title, SerializedProperty group, SerializedProperty activeField,
+            Action<Vector2> contextAction = null)
+        {
+            return DrawHeaderToggle(EditorGUIUtility.TrTextContent(title), group, activeField, contextAction);
+        }
 
-        public static bool DrawHeaderToggle(GUIContent title, SerializedProperty group, SerializedProperty activeField, Action<Vector2> contextAction = null)
+        public static bool DrawHeaderToggle(GUIContent title, SerializedProperty group, SerializedProperty activeField,
+            Action<Vector2> contextAction = null)
         {
             var backgroundRect = GUILayoutUtility.GetRect(1f, 17f);
 
@@ -100,12 +107,14 @@ namespace Midity.Playable.Editor
             backgroundRect.width += 4f;
 
             // Background
-            float backgroundTint = EditorGUIUtility.isProSkin ? 0.1f : 1f;
+            var backgroundTint = EditorGUIUtility.isProSkin ? 0.1f : 1f;
             EditorGUI.DrawRect(backgroundRect, new Color(backgroundTint, backgroundTint, backgroundTint, 0.2f));
 
             // Title
             using (new EditorGUI.DisabledScope(!activeField.boolValue))
+            {
                 EditorGUI.LabelField(labelRect, title, EditorStyles.boldLabel);
+            }
 
             // Foldout
             group.serializedObject.Update();
@@ -114,7 +123,8 @@ namespace Midity.Playable.Editor
 
             // Active checkbox
             activeField.serializedObject.Update();
-            activeField.boolValue = GUI.Toggle(toggleRect, activeField.boolValue, GUIContent.none, CoreEditorStyles.smallTickbox);
+            activeField.boolValue = GUI.Toggle(toggleRect, activeField.boolValue, GUIContent.none,
+                CoreEditorStyles.smallTickbox);
             activeField.serializedObject.ApplyModifiedProperties();
 
             // Context menu

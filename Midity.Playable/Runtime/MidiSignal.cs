@@ -6,10 +6,10 @@ namespace Midity.Playable
     // Payload for MIDI event notifications
     public sealed class MidiSignal : INotification
     {
-        // Notification ID (not in use)
-        PropertyName INotification.id { get { return default(PropertyName); } }
-
         // MIDI event
         public MTrkEvent Event { get; set; }
+
+        // Notification ID (not in use)
+        PropertyName INotification.id => default;
     }
 }

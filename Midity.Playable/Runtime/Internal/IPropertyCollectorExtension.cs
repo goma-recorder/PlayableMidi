@@ -11,11 +11,11 @@ namespace Midity.Playable
     // This class is used to invoke a generic method AddFromName<T> with a
     // dynamic type.
     //
-    static class IPropertyCollectorExtension
+    internal static class IPropertyCollectorExtension
     {
-        static (Type type, MethodInfo method) _genericAddFromName;
-        static (Type type, MethodInfo method) _specializedAddFromName;
-        static object [] _args2 = new object [2];
+        private static (Type type, MethodInfo method) _genericAddFromName;
+        private static (Type type, MethodInfo method) _specializedAddFromName;
+        private static readonly object[] _args2 = new object [2];
 
         internal static void AddFromName(
             this IPropertyCollector driver,
@@ -25,7 +25,6 @@ namespace Midity.Playable
             var driverType = driver.GetType();
 
             if (_genericAddFromName.type != driverType)
-            {
                 // Retrieve AddFromName<T>(GameObject, string)
                 foreach (var m in driverType.GetMethods())
                 {
@@ -41,18 +40,15 @@ namespace Midity.Playable
                     _specializedAddFromName = (null, null);
                     break;
                 }
-            }
 
             Debug.Assert(_genericAddFromName.method != null);
 
             if (_specializedAddFromName.type != componentType)
-            {
                 // Construct AddFromName<componentType>(GameObject, string)
                 _specializedAddFromName = (
                     componentType,
                     _genericAddFromName.method.MakeGenericMethod(componentType)
                 );
-            }
 
             // Invoke the specialized method.
             _args2[0] = go;

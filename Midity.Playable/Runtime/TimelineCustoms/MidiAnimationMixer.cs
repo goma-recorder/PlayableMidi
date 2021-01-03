@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.Playables;
 
@@ -5,18 +6,18 @@ namespace Midity.Playable
 {
     // Runtime playable class that manages a MIDI animation track (clips and
     // its assigned controls)
-    [System.Serializable]
+    [Serializable]
     public sealed class MidiAnimationMixer : PlayableBehaviour
     {
         #region Serialized variables
 
-        public MidiControl [] controls = new MidiControl [0];
+        public MidiControl[] controls = new MidiControl [0];
 
         #endregion
 
         #region PlayableBehaviour overrides
 
-        ControlAction[] _actions;
+        private ControlAction[] _actions;
 
         public override void OnPlayableCreate(UnityEngine.Playables.Playable playable)
         {
@@ -44,9 +45,9 @@ namespace Midity.Playable
 
                 for (var i = 0; i < playable.GetInputCount(); i++)
                 {
-                    var clip = (ScriptPlayable<MidiAnimation>)playable.GetInput(i);
+                    var clip = (ScriptPlayable<MidiAnimation>) playable.GetInput(i);
                     acc += playable.GetInputWeight(i) *
-                        clip.GetBehaviour().GetValue(clip, ctrl);
+                           clip.GetBehaviour().GetValue(clip, ctrl);
                 }
 
                 // Controller action invocation

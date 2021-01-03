@@ -5,7 +5,7 @@ namespace Midity.Playable.Editor
 {
     // Custom property drawer for ADSR envelope parameters
     [CustomPropertyDrawer(typeof(MidiEnvelope), true)]
-    sealed class MidiEnvelopeDrawer : PropertyDrawer
+    internal sealed class MidiEnvelopeDrawer : PropertyDrawer
     {
         #region Public method
 
@@ -44,36 +44,30 @@ namespace Midity.Playable.Editor
 
         #region Internal constants and variables
 
-        const float GraphHeight = 40;
+        private const float GraphHeight = 40;
 
-        static Color backgroundColor { get {
-            return EditorGUIUtility.isProSkin ?
-                new Color(0.18f, 0.18f, 0.18f) : new Color(0.45f, 0.45f, 0.45f);
-        } }
-        static Color highlightColor { get {
-            return EditorGUIUtility.isProSkin ?
-                new Color(0.25f, 0.25f, 0.25f) : new Color(0.5f, 0.5f, 0.5f);
-        } }
+        private static Color backgroundColor =>
+            EditorGUIUtility.isProSkin ? new Color(0.18f, 0.18f, 0.18f) : new Color(0.45f, 0.45f, 0.45f);
 
-        static Color guideColor { get {
-            return EditorGUIUtility.isProSkin ?
-                new Color(0.3f, 0.3f, 0.3f) : new Color(0.56f, 0.56f, 0.56f);
-        } }
+        private static Color highlightColor =>
+            EditorGUIUtility.isProSkin ? new Color(0.25f, 0.25f, 0.25f) : new Color(0.5f, 0.5f, 0.5f);
 
-        static Color LineColor { get {
-            return EditorGUIUtility.isProSkin ?
-                new Color(0.6f, 0.9f, 0.4f) : new Color(0.4f, 0.9f, 0.2f);
-        } }
+        private static Color guideColor =>
+            EditorGUIUtility.isProSkin ? new Color(0.3f, 0.3f, 0.3f) : new Color(0.56f, 0.56f, 0.56f);
 
-        static readonly GUIContent [] _adsrLabels = {
+        private static Color LineColor =>
+            EditorGUIUtility.isProSkin ? new Color(0.6f, 0.9f, 0.4f) : new Color(0.4f, 0.9f, 0.2f);
+
+        private static readonly GUIContent[] _adsrLabels =
+        {
             new GUIContent("A"), new GUIContent("D"),
             new GUIContent("S"), new GUIContent("R")
         };
 
-        static Vector3 [] _lineVerts = new Vector3 [2];
-        static Vector3 [] _graphVerts = new Vector3 [6];
+        private static readonly Vector3[] _lineVerts = new Vector3 [2];
+        private static readonly Vector3[] _graphVerts = new Vector3 [6];
 
-        Rect DrawEnvelopeParameterFields(Rect rect, SerializedProperty prop, GUIContent label)
+        private Rect DrawEnvelopeParameterFields(Rect rect, SerializedProperty prop, GUIContent label)
         {
             // Make a copy of the SerializedProperty to iterate fields.
             var itr = prop.Copy();
@@ -136,17 +130,18 @@ namespace Midity.Playable.Editor
         }
 
         // Retrieve serialized envelope parameters #not_very_efficient
-        MidiEnvelope RetrieveEnvelope(SerializedProperty prop)
+        private MidiEnvelope RetrieveEnvelope(SerializedProperty prop)
         {
-            return new MidiEnvelope {
-                attack  = prop.FindPropertyRelative("attack" ).floatValue,
-                decay   = prop.FindPropertyRelative("decay"  ).floatValue,
+            return new MidiEnvelope
+            {
+                attack = prop.FindPropertyRelative("attack").floatValue,
+                decay = prop.FindPropertyRelative("decay").floatValue,
                 sustain = prop.FindPropertyRelative("sustain").floatValue,
                 release = prop.FindPropertyRelative("release").floatValue
             };
         }
 
-        void DrawAALine(float x0, float y0, float x1, float y1)
+        private void DrawAALine(float x0, float y0, float x1, float y1)
         {
             _lineVerts[0].x = x0;
             _lineVerts[0].y = y0;
@@ -155,12 +150,12 @@ namespace Midity.Playable.Editor
             Handles.DrawAAPolyLine(_lineVerts);
         }
 
-        void DrawGraph(MidiEnvelope env, float width, float height, int controlID)
+        private void DrawGraph(MidiEnvelope env, float width, float height, int controlID)
         {
             const float scale = 2;
 
             // Time parameters
-            var t1 =      scale * env.AttackTime;
+            var t1 = scale * env.AttackTime;
             var t2 = t1 + scale * env.DecayTime;
             var t3 = t2 + scale * 0.2f;
             var t4 = t3 + scale * env.ReleaseTime;
