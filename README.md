@@ -1,5 +1,4 @@
-Playable Midi for Unity Timeline
-=======================================
+# Playable Midi
 
 ![Ableton](https://i.imgur.com/yxJr18E.png)
 ![Unity](https://i.imgur.com/aTMgdnB.gif)
@@ -12,57 +11,29 @@ to manage accurately synchronized timings compared to other non-musical
 timeline editors like Unity's one. Playable Midi is an extension of the [MIDI Animation Track](https://github.com/keijiro/MidiAnimationTrack).
 
 
-System requirements
--------------------
+## System requirements
 
 - Unity 2020.1 or later
 
-Installation
-------------
+## Dependency
+- [Midity](https://github.com/goma-recorder/Midity)
 
-<!--4567890123456789012345678901234567890123456789012345678901234567890123456-->
-To import the package, please add the following sections to the package
-manifest file (`Packages/manifest.json`).
+## Installation
 
-To the `scopedRegistries` section:
-
+### A. OpenUPM-CLI
 ```
-{
-  "name": "goma_recorder",
-  "url": "https://registry.npmjs.com",
-  "scopes": [ "jp.goma_recorder" ]
-}
+$ openupm add jp.goma_recorder.midity.playable
 ```
+[OpenUpm](https://openupm.com/packages/jp.goma_recorder.midity.playable)
 
-To the `dependencies` section:
-
-```
-"jp.goma_recorder.midity.playable": "1.1.0"
-```
-
-After changes, the manifest file should look like below:
-
-```
-{
-  "scopedRegistries": [
-    {
-      "name": "goma_recorder",
-      "url": "https://registry.npmjs.com",
-      "scopes": [ "jp.goma_recorder" ]
-    }
-  ],
-  "dependencies": {
-    "jp.goma_recorder.midity.playable": "1.1.0",
-    ...
-```
-
-or
-
+### B. Git url
 `Window -> Package Manager -> +▼ -> Add package from git url`
  - `https://github.com/goma-recorder/PlayableMidi.git?#upm`
+ 
+ ### C. Release page
+[here](https://github.com/goma-recorder/PlayableMidi/releases)
 
-Importing .mid files
---------------------
+## Importing .mid files
 
 You can import a `.mid` file as an asset file. Simply drag and drop it to the
 project view, or navigate to "Assets" - "Import New Asset...".
@@ -77,8 +48,7 @@ a timeline.
 
 ![Drag and drop](https://i.imgur.com/WVMaG6J.gif)
 
-Track controls
---------------
+## Track controls
 
 You can animate object properties from a MIDI animation track using **track
 controls**. To create a new track control, select a MIDI animation track (not a
@@ -132,8 +102,7 @@ contained in a MIDI track.
 
 You can specify which **CC Number** the control reacts to.
 
-MIDI signals
-------------
+## MIDI signals
 
 A MIDI animation track also supports sending [Timeline Signals] on key-on/off and some Meta
 events. To receive MIDI events from a track, you can use the **MIDI Signal
