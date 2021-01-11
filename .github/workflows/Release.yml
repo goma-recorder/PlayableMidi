@@ -33,7 +33,6 @@ jobs:
         git checkout master README.md || echo README.md not found
         mkdir Documentation~
         git mv README.md Documentation~/"$PKG_NAME".md
-        git checkout master README.md || echo README.md not found
         git checkout master CHANGELOG.md || echo CHANGELOG.md not found
         git checkout master LICENSE || echo LICENSE not found
         mv -f LICENSE LICENSE.md || echo Can not rename LICENSE
