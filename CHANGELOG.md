@@ -1,3 +1,15 @@
+# [2.0.0](https://github.com/goma-recorder/PlayableMidi/compare/v1.1.0...v2.0.0) (2021-01-11)
+
+
+### Features
+
+* Remove Midity ([041ddb2](https://github.com/goma-recorder/PlayableMidi/commit/041ddb2a061446bed0ec919bb618110a59831c0b))
+
+
+### BREAKING CHANGES
+
+* Remove Midity
+
 # [1.1.0](https://github.com/goma-recorder/PlayableMidi/compare/v1.0.0...v1.1.0) (2020-12-03)
 
 
