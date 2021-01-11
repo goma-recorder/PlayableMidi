@@ -5,6 +5,9 @@
   "version": "1.1.0",
   "unity": "2020.1",
   "description": "Playable Midi is a custom timeline/playables package that provides functionality to control object properties based on sequence data contained in a standard MIDI file",
+  "dependencies": {
+    "jp.goma_recorder.midity": "1.0.0"
+  },
   "keywords": [
     "unity",
     "midi"
