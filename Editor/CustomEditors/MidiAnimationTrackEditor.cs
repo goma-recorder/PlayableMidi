@@ -92,7 +92,7 @@ namespace Midity.Playable.Editor
             dst.curve = new AnimationCurve(src.curve.keys);
             dst.propertyName = src.propertyName;
             dst.fieldName = src.fieldName;
-            dst.ccNumber = src.ccNumber;
+            dst.ccController = src.ccController;
             dst.vector0 = src.vector0;
             dst.vector1 = src.vector1;
 

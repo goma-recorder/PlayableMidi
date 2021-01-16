@@ -17,7 +17,7 @@ namespace Midity.Playable
                 currentTick += mTrkEvent.Ticks;
                 if (!(mTrkEvent is NoteEvent noteEvent)) continue;
 
-                if (noteEvent.isNoteOn)
+                if (noteEvent is OnNoteEvent)
                 {
                     if (tickCash.ContainsKey(noteEvent.NoteNumber))
                         tickCash[noteEvent.NoteNumber] = currentTick;

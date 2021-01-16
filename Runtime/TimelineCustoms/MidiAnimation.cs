@@ -76,7 +76,7 @@ namespace Midity.Playable
             _frameData.output.PushNotification(_playable, _signalPool.Allocate(mTrkEvent));
         }
 
-        private (ControlChangeEvent i0, ControlChangeEvent i1) GetCCEventIndexAroundTick(uint tick, int ccNumber)
+        private (ControlChangeEvent i0, ControlChangeEvent i1) GetCCEventIndexAroundTick(uint tick, Controller controller)
         {
             var time = 0u;
             ControlChangeEvent lastEvent = null;
@@ -84,7 +84,7 @@ namespace Midity.Playable
             {
                 time += mEvent.Ticks;
                 if (!(mEvent is ControlChangeEvent e)) continue;
-                if (e.controlChangeNumber != ccNumber) continue;
+                if (e.controller != controller) continue;
                 if (time > tick) return (lastEvent, e);
                 lastEvent = e;
             }
@@ -92,10 +92,10 @@ namespace Midity.Playable
             return (lastEvent, lastEvent);
         }
 
-        private (NoteEvent iOn, NoteEvent iOff) GetNoteEventsBeforeTick(uint tick, MidiNoteFilter note)
+        private (OnNoteEvent iOn, OffNoteEvent iOff) GetNoteEventsBeforeTick(uint tick, MidiNoteFilter note)
         {
-            NoteEvent eOn = null;
-            NoteEvent eOff = null;
+            OnNoteEvent eOn = null;
+            OffNoteEvent eOff = null;
             var time = 0u;
             foreach (var mEvent in midiTrack.Events)
             {
@@ -103,14 +103,14 @@ namespace Midity.Playable
                 if (!(mEvent is NoteEvent e)) continue;
                 if (time > tick) break;
                 if (!note.Check(e)) continue;
-                if (e.isNoteOn)
+                if (e is OnNoteEvent eon)
                 {
-                    eOn = e;
+                    eOn = eon;
                     eOff = null;
                 }
-                else
+                else if(e is OffNoteEvent eof)
                 {
-                    eOff = e;
+                    eOff = eof;
                 }
             }
 
@@ -184,7 +184,7 @@ namespace Midity.Playable
         private float GetCCValue(MidiControl control, float time)
         {
             var tick = midiTrack.ConvertSecondToTicks(time);
-            var (i0, i1) = GetCCEventIndexAroundTick(tick, control.ccNumber);
+            var (i0, i1) = GetCCEventIndexAroundTick(tick, control.ccController);
 
             if (i0 == null) return 0;
             if (i1 == null) return i0.data / 127.0f;
