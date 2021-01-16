@@ -26,7 +26,7 @@ namespace Midity.Playable
             var mtrkEvent = ((MidiSignal) notification).Event;
             onFireEvent?.Invoke(mtrkEvent);
             if (noteFilter.Check(mtrkEvent, out var noteEvent))
-                (noteEvent.isNoteOn ? noteOnEvent : noteOffEvent).Invoke();
+                (noteEvent is OnNoteEvent ? noteOnEvent : noteOffEvent).Invoke();
         }
     }
 }

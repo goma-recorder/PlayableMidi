@@ -133,7 +133,7 @@ namespace Midity.Playable
         );
 
         // (CC mode) CC number
-        public int ccNumber = 1;
+        public Controller ccController = Controller.ModulationWheelCourse;
 
         // Component/property options
         public ExposedReference<Component> targetComponent;
