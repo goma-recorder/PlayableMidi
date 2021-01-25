@@ -30,7 +30,7 @@ namespace Midity.Playable.Editor
             {
                 const int topMargin = 2;
                 const int bottomMargin = 1;
-                texture = midiTrack.WriteNoteBarTexture2D(midiTrack.AllTicks,
+                texture = midiTrack.WriteNoteBarTexture2D(midiTrack.TotalTicks,
                     (int) midiTrack.DeltaTime / 2, topMargin,
                     bottomMargin);
                 if (_textures.ContainsKey(clip))
@@ -55,9 +55,9 @@ namespace Midity.Playable.Editor
                     _materials.Add(clip, material);
             }
 
-            var loopCount = (region.endTime - region.startTime) / midiTrack.AllSeconds;
+            var loopCount = (region.endTime - region.startTime) / midiTrack.TotalSeconds;
             material.SetFloat("_RepeatX", (float) loopCount);
-            material.SetFloat("_OffsetX", (float) (region.startTime / midiTrack.AllSeconds));
+            material.SetFloat("_OffsetX", (float) (region.startTime / midiTrack.TotalSeconds));
             var rect = region.position;
             var quantizedRect = new Rect(Mathf.Ceil(rect.x), Mathf.Ceil(rect.y), Mathf.Ceil(rect.width),
                 Mathf.Ceil(rect.height));
