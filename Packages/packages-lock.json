@@ -31,7 +31,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.test-framework": {
-      "version": "1.1.20",
+      "version": "1.1.22",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -63,11 +63,11 @@
       }
     },
     "jp.goma_recorder.midity": {
-      "version": "1.1.0",
+      "version": "https://github.com/goma-recorder/Midity.git?path=Assets/Plugins/jp.goma_recorder.midity#develop",
       "depth": 0,
-      "source": "registry",
+      "source": "git",
       "dependencies": {},
-      "url": "https://package.openupm.com"
+      "hash": "a2f141d75bf97b8b28c8c6e6df3ab1867a754e4c"
     },
     "com.unity.modules.ai": {
       "version": "1.0.0",

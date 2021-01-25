@@ -76,7 +76,8 @@ namespace Midity.Playable
             _frameData.output.PushNotification(_playable, _signalPool.Allocate(mTrkEvent));
         }
 
-        private (ControlChangeEvent i0, ControlChangeEvent i1) GetCCEventIndexAroundTick(uint tick, Controller controller)
+        private (ControlChangeEvent i0, ControlChangeEvent i1) GetCCEventIndexAroundTick(uint tick,
+            Controller controller)
         {
             var time = 0u;
             ControlChangeEvent lastEvent = null;
@@ -108,7 +109,7 @@ namespace Midity.Playable
                     eOn = eon;
                     eOff = null;
                 }
-                else if(e is OffNoteEvent eof)
+                else if (e is OffNoteEvent eof)
                 {
                     eOff = eof;
                 }
@@ -144,19 +145,16 @@ namespace Midity.Playable
 
             if (eOn == null) return 0;
 
-            // Note-on time
-            midiTrack.GetAbsoluteTime(eOn, out var onTime);
-
             // Note-off time
             var offTime = 0f;
             if (eOff != null)
-                midiTrack.GetAbsoluteTime(eOff, out offTime);
+                offTime = eOff.Ticks;
             else
                 offTime = time;
 
             var envelope = CalculateEnvelope(
                 control.envelope,
-                Mathf.Max(0, offTime - onTime),
+                Mathf.Max(0, offTime - eOn.Ticks),
                 Mathf.Max(0, time - offTime)
             );
 
@@ -172,10 +170,7 @@ namespace Midity.Playable
 
             if (iOn == null) return 0;
 
-            // Note-on time
-            midiTrack.GetAbsoluteTime(iOn, out var onTime);
-
-            var curve = control.curve.Evaluate(Mathf.Max(0, time - onTime));
+            var curve = control.curve.Evaluate(Mathf.Max(0, time - iOn.Ticks));
             var velocity = iOn.Velocity / 127.0f;
 
             return curve * velocity;
@@ -189,13 +184,10 @@ namespace Midity.Playable
             if (i0 == null) return 0;
             if (i1 == null) return i0.data / 127.0f;
 
-            midiTrack.GetAbsoluteTime(i0, out var t0);
-            midiTrack.GetAbsoluteTime(i1, out var t1);
-
             var v0 = i0.data / 127.0f;
             var v1 = i1.data / 127.0f;
 
-            return Mathf.Lerp(v0, v1, Mathf.Clamp01((time - t0) / (t1 - t0)));
+            return Mathf.Lerp(v0, v1, Mathf.Clamp01((time - i0.Ticks) / (i1.Ticks - i0.Ticks)));
         }
     }
 }
