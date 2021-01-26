@@ -1,0 +1,12 @@
+fileFormatVersion: 2
+guid: b6b7ac0bcca7c2649b58c8734b977dd2
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects: {}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 6782f17a22ce146e887bd8530aa7cadc, type: 3}
+  _characterCodeName: utf-8
+  _midiFileAsset: {instanceID: 0}
