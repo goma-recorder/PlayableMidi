@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.Playables;
 
@@ -29,13 +30,18 @@ namespace Midity.Playable
 
         public float GetValue(UnityEngine.Playables.Playable playable, MidiControl control)
         {
-            var t = (float) (playable.GetTime() % midiAnimationAsset.duration);
-            if (control.mode == MidiControl.Mode.NoteEnvelope)
-                return GetNoteEnvelopeValue(control, t);
-            if (control.mode == MidiControl.Mode.NoteCurve)
-                return GetNoteCurveValue(control, t);
-            // CC
-            return GetCCValue(control, t);
+            var t = (float) (playable.GetTime() % midiTrack.TotalSeconds);
+            switch (control.mode)
+            {
+                case MidiControl.Mode.NoteEnvelope:
+                    return GetNoteEnvelopeValue(control, t);
+                case MidiControl.Mode.NoteCurve:
+                    return GetNoteCurveValue(control, t);
+                case MidiControl.Mode.CC:
+                    return GetCCValue(control, t);
+                default:
+                    return 0;
+            }
         }
 
         public override object Clone()
@@ -93,29 +99,17 @@ namespace Midity.Playable
             return (lastEvent, lastEvent);
         }
 
-        private (OnNoteEvent iOn, OffNoteEvent iOff) GetNoteEventsBeforeTick(uint tick, MidiNoteFilter note)
+        private NoteEventPair GetNoteEventsBeforeTick(uint tick, MidiNoteFilter note)
         {
-            OnNoteEvent eOn = null;
-            OffNoteEvent eOff = null;
-            var time = 0u;
-            foreach (var mEvent in midiTrack.Events)
+            NoteEventPair pair = null;
+            foreach (var noteEventPair in midiTrack.NoteEventPairs)
             {
-                time += mEvent.Ticks;
-                if (!(mEvent is NoteEvent e)) continue;
-                if (time > tick) break;
-                if (!note.Check(e)) continue;
-                if (e is OnNoteEvent eon)
-                {
-                    eOn = eon;
-                    eOff = null;
-                }
-                else if (e is OffNoteEvent eof)
-                {
-                    eOff = eof;
-                }
+                if (noteEventPair.OnTick > tick) break;
+                if (!note.Check(noteEventPair.onNoteEvent)) continue;
+                pair = noteEventPair;
             }
 
-            return (eOn, eOff);
+            return pair;
         }
 
         private float CalculateEnvelope(MidiEnvelope envelope, float onTime, float offTime)
@@ -141,24 +135,20 @@ namespace Midity.Playable
         private float GetNoteEnvelopeValue(MidiControl control, float time)
         {
             var tick = midiTrack.ConvertSecondToTicks(time);
-            var (eOn, eOff) = GetNoteEventsBeforeTick(tick, control.noteFilter);
+            var pair = GetNoteEventsBeforeTick(tick, control.noteFilter);
 
-            if (eOn == null) return 0;
+            if (pair is null) return 0;
 
             // Note-off time
-            var offTime = 0f;
-            if (eOff != null)
-                offTime = eOff.Ticks;
-            else
-                offTime = time;
+            var offTime = Math.Min(midiTrack.ConvertTicksToSecond(pair.OffTick), time);
 
             var envelope = CalculateEnvelope(
                 control.envelope,
-                Mathf.Max(0, offTime - eOn.Ticks),
+                Mathf.Max(0, offTime - midiTrack.ConvertTicksToSecond(pair.OnTick)),
                 Mathf.Max(0, time - offTime)
             );
 
-            var velocity = eOn.Velocity / 127.0f;
+            var velocity = pair.Velocity / 127.0f;
 
             return envelope * velocity;
         }
@@ -166,12 +156,12 @@ namespace Midity.Playable
         private float GetNoteCurveValue(MidiControl control, float time)
         {
             var tick = midiTrack.ConvertSecondToTicks(time);
-            var (iOn, iOff) = GetNoteEventsBeforeTick(tick, control.noteFilter);
+            var pair = GetNoteEventsBeforeTick(tick, control.noteFilter);
 
-            if (iOn == null) return 0;
+            if (pair is null) return 0;
 
-            var curve = control.curve.Evaluate(Mathf.Max(0, time - iOn.Ticks));
-            var velocity = iOn.Velocity / 127.0f;
+            var curve = control.curve.Evaluate(Mathf.Max(0, time - midiTrack.ConvertTicksToSecond(pair.OnTick)));
+            var velocity = pair.Velocity / 127.0f;
 
             return curve * velocity;
         }
@@ -181,13 +171,15 @@ namespace Midity.Playable
             var tick = midiTrack.ConvertSecondToTicks(time);
             var (i0, i1) = GetCCEventIndexAroundTick(tick, control.ccController);
 
-            if (i0 == null) return 0;
-            if (i1 == null) return i0.data / 127.0f;
+            if (i0 is null) return 0;
+            if (i1 is null) return i0.data / 127.0f;
 
             var v0 = i0.data / 127.0f;
             var v1 = i1.data / 127.0f;
 
-            return Mathf.Lerp(v0, v1, Mathf.Clamp01((time - i0.Ticks) / (i1.Ticks - i0.Ticks)));
+            var t0 = midiTrack.ConvertTicksToSecond(i0.Ticks);
+            var t1 = midiTrack.ConvertTicksToSecond(i1.Ticks);
+            return Mathf.Lerp(v0, v1, Mathf.Clamp01((time - t0) / (t1 - t0)));
         }
     }
 }

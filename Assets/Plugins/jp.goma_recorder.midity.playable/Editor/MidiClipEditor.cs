@@ -22,17 +22,13 @@ namespace Midity.Playable.Editor
                 return;
 
             Texture texture;
-            if (_textures.ContainsKey(clip) && _textures[clip] == null)
-            {
+            if (_textures.ContainsKey(clip) && _textures[clip] is null)
                 texture = _textures[clip];
-            }
             else
             {
                 const int topMargin = 2;
                 const int bottomMargin = 1;
-                texture = midiTrack.WriteNoteBarTexture2D(midiTrack.TotalTicks,
-                    (int) midiTrack.DeltaTime / 2, topMargin,
-                    bottomMargin);
+                texture = midiTrack.WriteNoteBarTexture2D((int) midiTrack.DeltaTime / 2, topMargin, bottomMargin);
                 if (_textures.ContainsKey(clip))
                     _textures[clip] = texture;
                 else
@@ -40,10 +36,8 @@ namespace Midity.Playable.Editor
             }
 
             Material material;
-            if (_materials.ContainsKey(clip) && _materials[clip] == null)
-            {
+            if (_materials.ContainsKey(clip) && _materials[clip] is null)
                 material = _materials[clip];
-            }
             else
             {
                 var shader = Shader.Find("jp.goma_recorder.Midity.Playable/ClipBackground");
