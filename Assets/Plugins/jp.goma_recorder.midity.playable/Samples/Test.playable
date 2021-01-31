@@ -24,7 +24,7 @@ MonoBehaviour:
   - m_Version: 1
     m_Start: 0.8666666666666667
     m_ClipIn: 0
-    m_Asset: {fileID: 3396971952608728107}
+    m_Asset: {fileID: 7083267606593336682}
     m_Duration: 12
     m_TimeScale: 1
     m_ParentTrack: {fileID: -3802363643312003199}
@@ -137,14 +137,14 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
-      ccNumber: 1
+      ccController: 1
       targetComponent:
-        exposedName: 
+        exposedName: 9d0bda884b5b2ea428b1e552612a43dd
         defaultValue: {fileID: 0}
-      propertyName: 
-      fieldName: 
-      vector0: {x: 0, y: 0, z: 0, w: 0}
-      vector1: {x: 1, y: 1, z: 1, w: 0}
+      propertyName: localScale
+      fieldName: m_LocalScale
+      vector0: {x: 0.5, y: 0.5, z: 0.5, w: 0}
+      vector1: {x: 1.5, y: 1.5, z: 1.5, w: 0}
 --- !u!114 &-3040198309612938654
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -287,19 +287,6 @@ MonoBehaviour:
     m_Objects: []
   template:
     controls: []
---- !u!114 &3396971952608728107
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5d6c12d8ad7901a4e8468f23ed0a2dc2, type: 3}
-  m_Name: MidiAnimationAsset
-  m_EditorClassIdentifier: 
-  midiTrackAsset: {fileID: 5071388398726816915, guid: 3cc0a4a04746ea74286e69f866b42930, type: 3}
 --- !u!114 &6351916862804497071
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -323,6 +310,19 @@ MonoBehaviour:
   m_Clips: []
   m_Markers:
     m_Objects: []
+--- !u!114 &7083267606593336682
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d6c12d8ad7901a4e8468f23ed0a2dc2, type: 3}
+  m_Name: MidiAnimationAsset
+  m_EditorClassIdentifier: 
+  midiTrackAsset: {fileID: 5071388398726816915, guid: 3cc0a4a04746ea74286e69f866b42930, type: 3}
 --- !u!114 &8661159408310029804
 MonoBehaviour:
   m_ObjectHideFlags: 1
