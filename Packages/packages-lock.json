@@ -63,11 +63,11 @@
       }
     },
     "jp.goma_recorder.midity": {
-      "version": "https://github.com/goma-recorder/Midity.git?path=Assets/Plugins/jp.goma_recorder.midity#develop",
+      "version": "1.2.0",
       "depth": 0,
-      "source": "git",
+      "source": "registry",
       "dependencies": {},
-      "hash": "b561e992b419b96148bf0103465e0420fa6218a1"
+      "url": "https://package.openupm.com"
     },
     "com.unity.modules.ai": {
       "version": "1.0.0",

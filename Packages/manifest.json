@@ -6,7 +6,6 @@
     "com.unity.test-framework": "1.1.22",
     "com.unity.timeline": "1.3.7",
     "com.unity.ugui": "1.0.0",
-    "jp.goma_recorder.midity": "https://github.com/goma-recorder/Midity.git?path=Assets/Plugins/jp.goma_recorder.midity#develop",
     "com.unity.modules.ai": "1.0.0",
     "com.unity.modules.androidjni": "1.0.0",
     "com.unity.modules.animation": "1.0.0",
@@ -37,7 +36,8 @@
     "com.unity.modules.video": "1.0.0",
     "com.unity.modules.vr": "1.0.0",
     "com.unity.modules.wind": "1.0.0",
-    "com.unity.modules.xr": "1.0.0"
+    "com.unity.modules.xr": "1.0.0",
+    "jp.goma_recorder.midity": "1.2.0"
   },
   "scopedRegistries": [
     {
