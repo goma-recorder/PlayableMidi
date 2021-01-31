@@ -18,14 +18,14 @@
             "@semantic-release/npm",
             {
                 "npmPublish": false,
-                "pkgRoot": "Packages/jp.goma_recorder.midity.playable"
+                "pkgRoot": "Assets/Plugins/jp.goma_recorder.midity.playable"
             }
         ],
         [
             "@semantic-release/git",
             {
                 "assets": [
-                    "Packages/jp.goma_recorder.midity.playable/package.json",
+                    "Assets/Plugins/jp.goma_recorder.midity.playable/package.json",
                     "CHANGELOG.md"
                 ],
                 "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"

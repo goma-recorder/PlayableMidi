@@ -25,17 +25,7 @@ namespace Midity.Playable
             }
         }
 
-        private uint TickDuration
-        {
-            get
-            {
-                var bars = MidiTrack.Bars;
-                var tpq = MidiTrack.DeltaTime;
-                return bars * tpq * 4;
-            }
-        }
-
-        public override double duration => MidiTrack?.ConvertTicksToSecond(TickDuration) ?? 50;
+        public override double duration => MidiTrack?.TotalSeconds ?? 50;
 
         public ClipCaps clipCaps =>
             ClipCaps.Blending |
