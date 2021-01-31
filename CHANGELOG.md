@@ -1,3 +1,10 @@
+# [2.1.0](https://github.com/goma-recorder/PlayableMidi/compare/v2.0.0...v2.1.0) (2021-01-31)
+
+
+### Features
+
+* Update Midity v1.2.0 ([618d5c3](https://github.com/goma-recorder/PlayableMidi/commit/618d5c30f17ac47e441ca51654cf9a6f719c5488))
+
 # [2.0.0](https://github.com/goma-recorder/PlayableMidi/compare/v1.1.0...v2.0.0) (2021-01-11)
 
 
